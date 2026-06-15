@@ -9,9 +9,13 @@ import TransitionOverlay from '../components/TransitionOverlay';
 import FlavorTextModal from '../components/FlavorTextModal';
 import EventCardModal from '../components/EventCardModal';
 import EventResultModal from '../components/EventResultModal';
-import { RotateCcw, BookOpen, Globe } from 'lucide-react';
+import { RotateCcw, BookOpen, Globe, Library } from 'lucide-react';
 
-const Header: React.FC = () => {
+interface HeaderProps {
+  onEnterEncyclopedia: () => void;
+}
+
+const Header: React.FC<HeaderProps> = ({ onEnterEncyclopedia }) => {
   const { reset, isLoading, civilizationName } = useCivilizationStore();
 
   return (
@@ -37,6 +41,21 @@ const Header: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-4">
+            <button
+              onClick={onEnterEncyclopedia}
+              className="
+                group flex items-center gap-2 px-5 py-3
+                bg-slate-800 hover:bg-slate-700
+                text-white font-serif font-bold
+                rounded-xl border-2 border-slate-600
+                shadow-sm hover:shadow-md
+                transition-all duration-300
+              "
+            >
+              <Library className="w-5 h-5" />
+              <span className="hidden sm:inline">百科模式</span>
+            </button>
+
             <div className="text-right hidden sm:block">
               <p className="text-xs text-ochre-500 font-medium">当前文明</p>
               <p className="font-serif text-xl font-bold text-ochre-700">
@@ -112,7 +131,11 @@ const ErrorScreen: React.FC<{ message: string; onRetry: () => void }> = ({ messa
   );
 };
 
-const Home: React.FC = () => {
+interface HomeProps {
+  onEnterEncyclopedia: () => void;
+}
+
+const Home: React.FC<HomeProps> = ({ onEnterEncyclopedia }) => {
   const {
     init,
     isLoading,
@@ -168,7 +191,7 @@ const Home: React.FC = () => {
 
   return (
     <div className="min-h-screen">
-      <Header />
+      <Header onEnterEncyclopedia={onEnterEncyclopedia} />
 
       <main className="pb-16">
         <Timeline />

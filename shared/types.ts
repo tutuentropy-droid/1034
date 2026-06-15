@@ -119,3 +119,83 @@ export interface EventResolveResponse {
   data?: EventResult;
   error?: string;
 }
+
+export type TagCategory = 'cognitive' | 'agriculture' | 'cooperation' | 'religion' | 'capitalism' | 'empire' | 'science' | 'myth';
+
+export interface Tag {
+  id: string;
+  name: string;
+  category: TagCategory;
+  color: string;
+  description: string;
+}
+
+export interface KnowledgeNode {
+  id: string;
+  title: string;
+  subtitle: string;
+  era: string;
+  eraColor: string;
+  summary: string;
+  content: string;
+  keyInsights: string[];
+  imageUrl: string;
+  tags: string[];
+  relatedNodes: string[];
+  quizIds: string[];
+}
+
+export interface QuizQuestion {
+  id: string;
+  knowledgeNodeId: string;
+  question: string;
+  options: string[];
+  correctAnswerIndex: number;
+  explanation: string;
+}
+
+export interface QuizSubmission {
+  questionId: string;
+  selectedAnswerIndex: number;
+}
+
+export interface QuizResult {
+  questionId: string;
+  isCorrect: boolean;
+  correctAnswerIndex: number;
+  explanation: string;
+}
+
+export interface UserFavorite {
+  knowledgeNodeId: string;
+  timestamp: number;
+}
+
+export interface GraphNode {
+  id: string;
+  label: string;
+  x: number;
+  y: number;
+  color: string;
+  size: number;
+  era: string;
+}
+
+export interface GraphEdge {
+  source: string;
+  target: string;
+  label: string;
+}
+
+export interface KnowledgeGraph {
+  nodes: GraphNode[];
+  edges: GraphEdge[];
+}
+
+export interface EncyclopediaListResponse extends ApiResponse<KnowledgeNode[]> {}
+export interface EncyclopediaNodeResponse extends ApiResponse<KnowledgeNode> {}
+export interface TagsResponse extends ApiResponse<Tag[]> {}
+export interface QuizResponse extends ApiResponse<QuizQuestion[]> {}
+export interface QuizSubmitResponse extends ApiResponse<QuizResult[]> {}
+export interface FavoritesResponse extends ApiResponse<UserFavorite[]> {}
+export interface GraphResponse extends ApiResponse<KnowledgeGraph> {}

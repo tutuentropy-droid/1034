@@ -1,0 +1,58 @@
+[
+  {
+    "id": "cognitive-revolution",
+    "name": "认知革命",
+    "category": "cognitive",
+    "color": "#757575",
+    "description": "约7万年前，智人发展出复杂语言和抽象思维能力的重大转折点。"
+  },
+  {
+    "id": "agricultural-revolution",
+    "name": "农业革命",
+    "category": "agriculture",
+    "color": "#558B2F",
+    "description": "约1万年前，人类从狩猎采集转向农耕定居的历史性变革。"
+  },
+  {
+    "id": "cooperation",
+    "name": "合作",
+    "category": "cooperation",
+    "color": "#1976D2",
+    "description": "人类通过虚构故事实现大规模协作的独特能力。"
+  },
+  {
+    "id": "religion",
+    "name": "宗教",
+    "category": "religion",
+    "color": "#7B1FA2",
+    "description": "基于超自然信仰的社会规范和价值体系。"
+  },
+  {
+    "id": "capitalism",
+    "name": "资本主义",
+    "category": "capitalism",
+    "color": "#F57C00",
+    "description": "以私有财产和自由市场为核心的现代经济体系。"
+  },
+  {
+    "id": "empire",
+    "name": "帝国",
+    "category": "empire",
+    "color": "#4A148C",
+    "description": "统一政治权威下多民族多地域的大规模政治组织。"
+  },
+  {
+    "id": "science",
+    "name": "科学革命",
+    "category": "science",
+    "color": "#0D47A1",
+    "description": "16世纪以来以实证方法探索自然规律的知识革命。"
+  },
+  {
+    "id": "fictional-stories",
+    "name": "虚构故事",
+    "category": "myth",
+    "color": "#E64A19",
+    "description": "人类通过共同想象的概念实现大规模合作的核心机制。"
+  }
+]

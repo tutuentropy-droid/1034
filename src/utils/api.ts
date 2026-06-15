@@ -7,6 +7,20 @@ import type {
   HistoricalEvent,
   EventTriggerResponse,
   EventResolveResponse,
+  KnowledgeNode,
+  Tag,
+  QuizQuestion,
+  QuizSubmission,
+  QuizResult,
+  UserFavorite,
+  KnowledgeGraph,
+  EncyclopediaListResponse,
+  EncyclopediaNodeResponse,
+  TagsResponse,
+  QuizResponse,
+  QuizSubmitResponse,
+  FavoritesResponse,
+  GraphResponse,
 } from '../types';
 
 const API_BASE = '/api';
@@ -79,4 +93,48 @@ export async function checkEventTrigger(
     method: 'POST',
     body: JSON.stringify({ stats, currentEra }),
   });
+}
+
+export async function fetchAllKnowledgeNodes(tagFilter?: string): Promise<EncyclopediaListResponse> {
+  const url = tagFilter ? `/encyclopedia/nodes?tag=${encodeURIComponent(tagFilter)}` : '/encyclopedia/nodes';
+  return fetchJson<EncyclopediaListResponse>(url);
+}
+
+export async function fetchKnowledgeNodeById(id: string): Promise<EncyclopediaNodeResponse> {
+  return fetchJson<EncyclopediaNodeResponse>(`/encyclopedia/nodes/${id}`);
+}
+
+export async function fetchAllTags(): Promise<TagsResponse> {
+  return fetchJson<TagsResponse>('/encyclopedia/tags');
+}
+
+export async function fetchQuizzesByNodeId(nodeId: string): Promise<QuizResponse> {
+  return fetchJson<QuizResponse>(`/encyclopedia/quizzes/${nodeId}`);
+}
+
+export async function submitQuizAnswers(submissions: QuizSubmission[]): Promise<QuizSubmitResponse> {
+  return fetchJson<QuizSubmitResponse>('/encyclopedia/quizzes/submit', {
+    method: 'POST',
+    body: JSON.stringify({ submissions }),
+  });
+}
+
+export async function fetchUserFavorites(): Promise<FavoritesResponse> {
+  return fetchJson<FavoritesResponse>('/encyclopedia/favorites');
+}
+
+export async function addFavorite(nodeId: string): Promise<FavoritesResponse> {
+  return fetchJson<FavoritesResponse>(`/encyclopedia/favorites/${nodeId}`, {
+    method: 'POST',
+  });
+}
+
+export async function removeFavorite(nodeId: string): Promise<FavoritesResponse> {
+  return fetchJson<FavoritesResponse>(`/encyclopedia/favorites/${nodeId}`, {
+    method: 'DELETE',
+  });
+}
+
+export async function fetchKnowledgeGraph(): Promise<GraphResponse> {
+  return fetchJson<GraphResponse>('/encyclopedia/graph');
 }
