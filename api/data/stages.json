@@ -1,0 +1,169 @@
+[
+  {
+    "id": "cognitive-revolution",
+    "era": "认知革命",
+    "title": "认知革命",
+    "subtitle": "约公元前70,000年 - 公元前10,000年",
+    "imageUrl": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=prehistoric%20humans%20around%20campfire%20cave%20painting%20stone%20tools%20dramatic%20lighting%20realistic%20painting%20style&image_size=landscape_16_9",
+    "eraColor": "stoneAge",
+    "encyclopedia": "认知革命是人类历史上的第一个重大转折点。大约在7万年前，智人（Homo sapiens）开始发展出复杂的语言能力、抽象思维和虚构故事的能力。这一革命使得人类能够进行大规模合作，超越了其他人类物种（如尼安德特人）的局限。\n\n在这个时期，人类开始创造艺术、宗教信仰和社会规范。考古发现表明，这一时期的智人已经能够制作复杂的石器、使用火种，并开始进行远距离贸易。更重要的是，他们开始相信共同的神话和传说，这使得数百甚至数千陌生人能够为了共同目标而合作。\n\n尤瓦尔·赫拉利在《人类简史》中指出，正是这种「讨论虚构事物」的能力，使得智人最终统治了地球。",
+    "startingStats": {
+      "population": 10,
+      "technology": 5,
+      "culture": 5,
+      "military": 5,
+      "agriculture": 0
+    },
+    "choices": [
+      {
+        "id": "develop-language",
+        "title": "发展复杂语言",
+        "description": "投入资源发展更复杂的交流系统，让部落能够分享抽象思想和复杂计划。",
+        "effects": {
+          "culture": 15,
+          "technology": 5,
+          "population": 5
+        },
+        "nextStageId": "agricultural-revolution",
+        "flavorText": "你的部落发展出了丰富的语言体系。人们开始讲述神话传说，制定社会规则。复杂的交流能力让你们能够协调更大规模的狩猎行动，部落凝聚力大大增强。"
+      },
+      {
+        "id": "master-fire",
+        "title": "掌握火的艺术",
+        "description": "专注于火的控制和使用，改善烹饪、取暖和防御能力。",
+        "effects": {
+          "technology": 15,
+          "population": 10,
+          "military": 5
+        },
+        "nextStageId": "agricultural-revolution",
+        "flavorText": "火的掌握彻底改变了部落的生活方式。烹饪后的食物更容易消化，促进了大脑发育；火光驱散了夜晚的恐惧，也吓退了猛兽。你的部落成为了夜晚的主人。"
+      }
+    ]
+  },
+  {
+    "id": "agricultural-revolution",
+    "era": "农业革命",
+    "title": "农业革命",
+    "subtitle": "约公元前10,000年 - 公元前3,000年",
+    "imageUrl": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=ancient%20farmers%20with%20plow%20wheat%20fields%20domesticated%20animals%20early%20village%20sunrise%20pastoral%20scene&image_size=landscape_16_9",
+    "eraColor": "agricultural",
+    "encyclopedia": "农业革命是人类历史上最重大的变革之一。大约在1万年前，人类开始从狩猎采集的生活方式转向农业定居。这一转变首先发生在新月沃地（Fertile Crescent），随后传播到世界各地。\n\n农业的出现带来了深刻的社会变革：人类开始定居，形成了村落和城镇；粮食盈余使得一部分人可以脱离食物生产，成为工匠、祭司和统治者；私有财产和社会阶层开始出现。\n\n然而，赫拉利也指出了农业革命的「陷阱」：虽然粮食总产量增加了，但农民的工作时间更长，饮食更单一，疾病也更容易传播。人类驯化了小麦，还是小麦驯化了人类？这是一个值得深思的问题。",
+    "startingStats": {
+      "agriculture": 10
+    },
+    "choices": [
+      {
+        "id": "become-hunter-tribe",
+        "title": "保持狩猎部落传统",
+        "description": "虽然农业在兴起，但你的部落选择继续过着流动的狩猎采集生活，与自然保持和谐。",
+        "effects": {
+          "population": 10,
+          "military": 10,
+          "culture": 10,
+          "agriculture": -5
+        },
+        "nextStageId": "imperial-age",
+        "flavorText": "你的部落保持了狩猎采集的传统智慧。虽然人口增长较慢，但人们身体强健，与自然和谐共处。当农业社会遭遇饥荒时，你们反而能在广阔的土地上找到丰富的食物来源。"
+      },
+      {
+        "id": "start-farming",
+        "title": "开始种植与定居",
+        "description": "放弃游牧生活，在肥沃的河谷定居下来，开始种植作物和驯化动物。",
+        "effects": {
+          "agriculture": 25,
+          "population": 20,
+          "technology": 5,
+          "military": -5
+        },
+        "nextStageId": "imperial-age",
+        "flavorText": "你的部落定居在肥沃的河谷边，开始了日出而作、日落而息的农耕生活。麦田金黄，牛羊成群，村落不断扩大。虽然需要辛苦劳作，但稳定的粮食供给让人口迅速增长，为文明的崛起奠定了基础。"
+      }
+    ]
+  },
+  {
+    "id": "imperial-age",
+    "era": "帝国时代",
+    "title": "帝国的兴衰",
+    "subtitle": "约公元前3,000年 - 公元1,500年",
+    "imageUrl": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=ancient%20rome%20colosseum%20with%20emperor%20and%20legionaries%20grand%20architecture%20epic%20historical%20painting&image_size=landscape_16_9",
+    "eraColor": "imperial",
+    "encyclopedia": "帝国时代见证了人类社会组织形式的巨大飞跃。从美索不达米亚的城邦、古埃及的法老王朝，到秦汉帝国、罗马帝国、波斯帝国、阿拉伯帝国，再到美洲的玛雅和阿兹特克文明，帝国成为了这一时期最主要的政治组织形式。\n\n帝国的兴起带来了几个重要的发展：统一的法律和行政系统、标准化的货币和度量衡、大规模的公共工程（道路、水渠、神庙）、以及文化和宗教的融合与传播。\n\n赫拉利强调，帝国虽然常常伴随着暴力和压迫，但它们也促进了不同民族间的交流与融合，为现代全球化奠定了基础。许多现代国家的边界、语言和文化传统，都可以追溯到历史上的某个帝国。",
+    "startingStats": {
+      "military": 10,
+      "culture": 10
+    },
+    "choices": [
+      {
+        "id": "build-trade-empire",
+        "title": "建立贸易帝国",
+        "description": "专注于发展商业网络和文化交流，通过贸易而非征服来扩张影响力。",
+        "effects": {
+          "culture": 20,
+          "technology": 15,
+          "population": 10,
+          "agriculture": 5,
+          "military": -5
+        },
+        "nextStageId": "scientific-revolution",
+        "flavorText": "你的帝国成为了东西方贸易的桥梁。商队沿着丝绸之路络绎不绝，不同文明的思想、技术和物产在这里交汇。虽然军事力量不算最强，但你的帝国因其富庶和文化繁荣而被世人向往。"
+      },
+      {
+        "id": "conquer-empire",
+        "title": "通过征服扩张",
+        "description": "建立强大的军队，通过军事征服建立一个疆域辽阔的大帝国。",
+        "effects": {
+          "military": 25,
+          "population": 15,
+          "agriculture": 10,
+          "culture": -5,
+          "technology": 5
+        },
+        "nextStageId": "scientific-revolution",
+        "flavorText": "你的军团所向披靡，帝国的疆域不断扩张。被征服的民族带来了新的财富、奴隶和文化，但持续的战争也消耗着帝国的根基。"
+      }
+    ]
+  },
+  {
+    "id": "scientific-revolution",
+    "era": "科学革命",
+    "title": "科学革命与现代性",
+    "subtitle": "公元1,500年 - 至今",
+    "imageUrl": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=renaissance%20scientists%20galileo%20telescope%20newton%20apple%20laboratory%20discovery%20enlightenment%20era&image_size=landscape_16_9",
+    "eraColor": "scientific",
+    "encyclopedia": "科学革命始于16世纪的欧洲，标志着人类进入了现代纪元。哥白尼的日心说、伽利略的望远镜观测、牛顿的力学体系、达尔文的进化论……这些科学发现彻底改变了人类对宇宙和自身的认知。\n\n科学革命的核心是承认「无知」——科学家不再盲目崇拜古代权威，而是通过观察和实验来探索未知。这种「不知为不知」的态度，反而成为了人类知识爆炸式增长的动力。\n\n赫拉利指出，科学与资本主义、帝国主义的结合，塑造了现代世界。科学为技术进步提供了基础，资本主义为科学研究提供了资金，而帝国主义则将科学的成果传播到全球。今天，我们生活在一个由科学定义的时代，但也面临着前所未有的伦理和生存挑战。",
+    "startingStats": {
+      "technology": 20
+    },
+    "choices": [
+      {
+        "id": "embrace-science",
+        "title": "拥抱科学理性",
+        "description": "大力发展科学研究和教育，相信理性和进步能够解决人类面临的问题。",
+        "effects": {
+          "technology": 30,
+          "population": 20,
+          "agriculture": 15,
+          "military": 10,
+          "culture": 5
+        },
+        "nextStageId": "complete",
+        "flavorText": "你的文明站在了科学时代的前沿。实验室里不断涌现新的发现，工厂里发明了神奇的机器，医学的进步让人类寿命翻倍。理性和进步的信念深入人心，人们相信一个更美好的未来正在到来。"
+      },
+      {
+        "id": "balance-wisdom",
+        "title": "追求智慧与平衡",
+        "description": "在发展科学的同时，注重传统智慧和人文精神，寻求人与自然的和谐。",
+        "effects": {
+          "culture": 25,
+          "technology": 15,
+          "population": 10,
+          "agriculture": 20,
+          "military": 5
+        },
+        "nextStageId": "complete",
+        "flavorText": "你的文明选择了一条更为温和的道路。科学技术在发展，但始终受到伦理和传统智慧的引导。人们更加关注生活质量而非物质积累，与自然保持着平衡。这种「慢发展」的模式，在这个躁动的时代显得格外珍贵。"
+      }
+    ]
+  }
+]
