@@ -8,6 +8,13 @@ import type {
   ChoiceResult,
   ResetResult,
   EraType,
+  EventCategory,
+  EventCondition,
+  EventChoice,
+  HistoricalEvent,
+  EventResult,
+  EventTriggerResponse,
+  EventResolveResponse,
 } from '../../shared/types';
 
 export type {
@@ -19,9 +26,49 @@ export type {
   ChoiceResult,
   ResetResult,
   EraType,
+  EventCategory,
+  EventCondition,
+  EventChoice,
+  HistoricalEvent,
+  EventResult,
+  EventTriggerResponse,
+  EventResolveResponse,
 };
 
 export type CivilizationStats = TCivilizationStats;
+
+export const EVENT_CATEGORY_LABELS: Record<EventCategory, string> = {
+  plague: '瘟疫',
+  religion: '宗教',
+  trade: '贸易',
+  currency: '货币',
+  empire: '帝国',
+  war: '战争',
+  disaster: '灾难',
+  innovation: '革新',
+};
+
+export const EVENT_CATEGORY_COLORS: Record<EventCategory, string> = {
+  plague: 'from-red-500',
+  religion: 'from-purple-500',
+  trade: 'from-amber-500',
+  currency: 'from-yellow-500',
+  empire: 'from-indigo-500',
+  war: 'from-orange-600',
+  disaster: 'from-gray-600',
+  innovation: 'from-cyan-500',
+};
+
+export const EVENT_CATEGORY_BG: Record<EventCategory, string> = {
+  plague: 'bg-red-500',
+  religion: 'bg-purple-500',
+  trade: 'bg-amber-500',
+  currency: 'bg-yellow-500',
+  empire: 'bg-indigo-500',
+  war: 'bg-orange-600',
+  disaster: 'bg-gray-600',
+  innovation: 'bg-cyan-500',
+};
 
 export interface StatChange {
   key: keyof CivilizationStats;

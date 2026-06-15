@@ -62,3 +62,60 @@ export interface ResetResult {
 }
 
 export type EraType = 'cognitive' | 'agricultural' | 'imperial' | 'scientific';
+
+export type EventCategory = 'plague' | 'religion' | 'trade' | 'currency' | 'empire' | 'war' | 'disaster' | 'innovation';
+
+export interface EventCondition {
+  type: 'stat_above' | 'stat_below' | 'stat_between' | 'era_is' | 'era_not' | 'random_chance';
+  stat?: keyof CivilizationStats;
+  value?: number;
+  min?: number;
+  max?: number;
+  era?: EraType | string;
+  chance?: number;
+}
+
+export interface EventChoice {
+  id: string;
+  title: string;
+  description: string;
+  effects: Partial<CivilizationStats>;
+  flavorText: string;
+  requirements?: EventCondition[];
+}
+
+export interface HistoricalEvent {
+  id: string;
+  category: EventCategory;
+  title: string;
+  subtitle: string;
+  description: string;
+  imageUrl: string;
+  icon: string;
+  era: string[];
+  conditions: EventCondition[];
+  baseProbability: number;
+  choices: EventChoice[];
+}
+
+export interface EventResult {
+  event: HistoricalEvent;
+  choice: EventChoice;
+  newStats: CivilizationStats;
+  effects: Partial<CivilizationStats>;
+}
+
+export interface EventTriggerResponse {
+  success: boolean;
+  data?: {
+    event: HistoricalEvent;
+    probability: number;
+  };
+  error?: string;
+}
+
+export interface EventResolveResponse {
+  success: boolean;
+  data?: EventResult;
+  error?: string;
+}

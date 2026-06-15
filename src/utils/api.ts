@@ -4,6 +4,9 @@ import type {
   ChoiceResult,
   ResetResult,
   ApiResponse,
+  HistoricalEvent,
+  EventTriggerResponse,
+  EventResolveResponse,
 } from '../types';
 
 const API_BASE = '/api';
@@ -45,4 +48,35 @@ export async function submitChoice(
 
 export async function resetCivilization(): Promise<ApiResponse<ResetResult>> {
   return fetchJson<ApiResponse<ResetResult>>('/civilization/reset');
+}
+
+export async function triggerEvent(
+  stats: CivilizationStats,
+  currentEra: string
+): Promise<EventTriggerResponse> {
+  return fetchJson<EventTriggerResponse>('/events/trigger', {
+    method: 'POST',
+    body: JSON.stringify({ stats, currentEra }),
+  });
+}
+
+export async function resolveEvent(
+  eventId: string,
+  choiceId: string,
+  currentStats: CivilizationStats
+): Promise<EventResolveResponse> {
+  return fetchJson<EventResolveResponse>('/events/resolve', {
+    method: 'POST',
+    body: JSON.stringify({ eventId, choiceId, currentStats }),
+  });
+}
+
+export async function checkEventTrigger(
+  stats: CivilizationStats,
+  currentEra: string
+): Promise<ApiResponse<{ shouldTrigger: boolean; event?: HistoricalEvent; probability?: number }>> {
+  return fetchJson<ApiResponse<{ shouldTrigger: boolean; event?: HistoricalEvent; probability?: number }>>('/events/check', {
+    method: 'POST',
+    body: JSON.stringify({ stats, currentEra }),
+  });
 }

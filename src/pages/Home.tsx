@@ -7,6 +7,8 @@ import StageCard from '../components/StageCard';
 import CompletionScreen from '../components/CompletionScreen';
 import TransitionOverlay from '../components/TransitionOverlay';
 import FlavorTextModal from '../components/FlavorTextModal';
+import EventCardModal from '../components/EventCardModal';
+import EventResultModal from '../components/EventResultModal';
 import { RotateCcw, BookOpen, Globe } from 'lucide-react';
 
 const Header: React.FC = () => {
@@ -111,9 +113,21 @@ const ErrorScreen: React.FC<{ message: string; onRetry: () => void }> = ({ messa
 };
 
 const Home: React.FC = () => {
-  const { init, isLoading, error, isComplete, isTransitioning, currentStage, stats } =
-    useCivilizationStore();
+  const {
+    init,
+    isLoading,
+    error,
+    isComplete,
+    isTransitioning,
+    currentStage,
+    stats,
+    showFlavorText,
+    showEventModal,
+    showEventResult,
+    checkForEvent,
+  } = useCivilizationStore();
   const [previousStats, setPreviousStats] = useState<CivilizationStats | undefined>(undefined);
+  const [previousFlavorText, setPreviousFlavorText] = useState(false);
 
   useEffect(() => {
     init();
@@ -124,6 +138,16 @@ const Home: React.FC = () => {
       setPreviousStats(stats);
     }
   }, [isTransitioning, stats]);
+
+  useEffect(() => {
+    if (previousFlavorText && !showFlavorText && !isComplete && !showEventModal && !showEventResult) {
+      const timer = setTimeout(() => {
+        checkForEvent();
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+    setPreviousFlavorText(showFlavorText);
+  }, [showFlavorText, previousFlavorText, isComplete, showEventModal, showEventResult, checkForEvent]);
 
   if (isLoading && !currentStage) {
     return <LoadingScreen />;
@@ -163,6 +187,8 @@ const Home: React.FC = () => {
       <TransitionOverlay isVisible={isTransitioning} color={transitionColor} />
 
       <FlavorTextModal />
+      <EventCardModal />
+      <EventResultModal />
     </div>
   );
 };

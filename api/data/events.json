@@ -1,0 +1,437 @@
+[
+  {
+    "id": "bubonic-plague",
+    "category": "plague",
+    "title": "黑死病",
+    "subtitle": "瘟疫降临",
+    "description": "一场可怕的瘟疫正在你的土地上蔓延。人们纷纷病倒，村庄陷入死寂。这是对文明的严峻考验。",
+    "imageUrl": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=medieval%20plague%20doctor%20with%20mask%20dark%20atmosphere%20deserted%20village&image_size=landscape_16_9",
+    "icon": "Skull",
+    "era": ["agricultural", "imperial"],
+    "conditions": [
+      {
+        "type": "stat_above",
+        "stat": "population",
+        "value": 30
+      },
+      {
+        "type": "stat_below",
+        "stat": "technology",
+        "value": 30
+      }
+    ],
+    "baseProbability": 0.15,
+    "choices": [
+      {
+        "id": "isolate-sick",
+        "title": "隔离病患",
+        "description": "将病人隔离，限制人员流动，牺牲经济换取生存。",
+        "effects": {
+          "population": -15,
+          "agriculture": -10,
+          "technology": 5
+        },
+        "flavorText": "你下令严格隔离，许多村落被封锁。虽然经济遭受重创，但瘟疫最终被控制住了。人们学会了基本的卫生知识。"
+      },
+      {
+        "id": "pray-heal",
+        "title": "祈求神灵",
+        "description": "举办大型宗教仪式，祈求神灵保佑，希望信仰的力量能战胜瘟疫。",
+        "effects": {
+          "population": -25,
+          "culture": 15,
+          "technology": -5
+        },
+        "flavorText": "祭坛上烟雾缭绕，祭司们日夜祈祷。瘟疫夺去了许多人的生命，但幸存者的信仰更加坚定，文化在苦难中升华。"
+      },
+      {
+        "id": "flee-cities",
+        "title": "疏散乡村",
+        "description": "让人们疏散到乡村，远离拥挤的城市，分散居住降低感染风险。",
+        "effects": {
+          "population": -10,
+          "agriculture": 5,
+          "military": -10
+        },
+        "flavorText": "城市变得空荡荡的，人们分散到广阔的乡村。虽然军事力量削弱了，但更多人活了下来，农业生产在乡村得到发展。"
+      }
+    ]
+  },
+  {
+    "id": "religious-revival",
+    "category": "religion",
+    "title": "宗教崛起",
+    "subtitle": "信仰的力量",
+    "description": "一位先知带来了新的教义，迅速在民众中传播。人们对这股新兴的宗教充满热情，它将深刻影响你的文明。",
+    "imageUrl": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=ancient%20prophet%20preaching%20to%20crowd%20religious%20ceremony%20sunlight&image_size=landscape_16_9",
+    "icon": "Church",
+    "era": ["agricultural", "imperial", "scientific"],
+    "conditions": [
+      {
+        "type": "stat_below",
+        "stat": "culture",
+        "value": 40
+      }
+    ],
+    "baseProbability": 0.2,
+    "choices": [
+      {
+        "id": "embrace-religion",
+        "title": "拥抱新信仰",
+        "description": "将新宗教奉为国教，利用信仰的力量团结人民。",
+        "effects": {
+          "culture": 25,
+          "military": 10,
+          "technology": -10
+        },
+        "flavorText": "新宗教成为国教，人们在共同的信仰下团结一心。教堂和寺庙拔地而起，文化繁荣，但对异端思想的排斥也抑制了科学探索。"
+      },
+      {
+        "id": "tolerate-all",
+        "title": "宗教宽容",
+        "description": "允许多种信仰共存，保护思想自由。",
+        "effects": {
+          "culture": 15,
+          "technology": 10,
+          "population": 5
+        },
+        "flavorText": "你宣布宗教宽容政策。各种信仰和谐共存，文化和思想在交流碰撞中繁荣发展，吸引了各地的人们。"
+      },
+      {
+        "id": "state-control",
+        "title": "控制宗教",
+        "description": "将宗教置于国家控制之下，防止其成为统治工具。",
+        "effects": {
+          "military": 15,
+          "culture": -5,
+          "population": 10
+        },
+        "flavorText": "你将宗教纳入国家体系。宗教成为巩固统治的工具，军队士气高涨，但文化的自由发展受到一定限制。"
+      }
+    ]
+  },
+  {
+    "id": "trade-route",
+    "category": "trade",
+    "title": "贸易路线开辟",
+    "subtitle": "商路的机遇",
+    "description": "远方的商队带来了新的贸易路线。一条连接东西方的商路正在形成，这是发展商业的绝佳机会。",
+    "imageUrl": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=silk%20road%20caravan%20desert%20camel%20merchants%20sunset&image_size=landscape_16_9",
+    "icon": "Ship",
+    "era": ["agricultural", "imperial", "scientific"],
+    "conditions": [
+      {
+        "type": "stat_above",
+        "stat": "agriculture",
+        "value": 20
+      }
+    ],
+    "baseProbability": 0.25,
+    "choices": [
+      {
+        "id": "build-cities",
+        "title": "兴建贸易城市",
+        "description": "在商路沿线兴建贸易城市，促进商业繁荣。",
+        "effects": {
+          "population": 20,
+          "technology": 10,
+          "culture": 10,
+          "military": -5
+        },
+        "flavorText": "繁华的贸易城市在商路沿线拔地而起。来自世界各地的商人云集于此，带来了财富、技术和文化交流。"
+      },
+      {
+        "id": "protect-caravans",
+        "title": "保护商队",
+        "description": "派遣军队保护商队，确保贸易安全。",
+        "effects": {
+          "agriculture": 15,
+          "military": 5,
+          "technology": 5,
+          "population": 10
+        },
+        "flavorText": "你的军队保障了商路的安全。商人们愿意来此贸易，农业和经济稳步发展。"
+      },
+      {
+        "id": "collect-tolls",
+        "title": "征收关税",
+        "description": "对过往商队征收关税，充实国库。",
+        "effects": {
+          "technology": 15,
+          "agriculture": -5,
+          "culture": 5
+        },
+        "flavorText": "关税带来了丰厚的财政收入，你用这些资金发展科技。虽然一些商人转向其他路线，但整体贸易仍在继续。"
+      }
+    ]
+  },
+  {
+    "id": "currency-invention",
+    "category": "currency",
+    "title": "货币发明",
+    "subtitle": "金融的诞生",
+    "description": "金属货币的概念从远方传来。取代物物交换的时代即将结束，货币经济的时代正在到来。",
+    "imageUrl": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=ancient%20coins%20gold%20silver%20mint%20workshop%20merchants&image_size=landscape_16_9",
+    "icon": "Coins",
+    "era": ["agricultural", "imperial"],
+    "conditions": [
+      {
+        "type": "stat_above",
+        "stat": "technology",
+        "value": 25
+      }
+    ],
+    "baseProbability": 0.18,
+    "choices": [
+      {
+        "id": "gold-standard",
+        "title": "建立金本位",
+        "description": "以黄金为基础发行货币，建立稳定的货币体系。",
+        "effects": {
+          "technology": 15,
+          "agriculture": 15,
+          "population": 10,
+          "culture": 5
+        },
+        "flavorText": "你下令铸造精美金币。货币的流通极大地促进了经济发展，贸易变得前所未有的便利。"
+      },
+      {
+        "id": "central-bank",
+        "title": "设立中央铸币局",
+        "description": "由国家垄断货币发行，设立专门的铸币机构。",
+        "effects": {
+          "technology": 20,
+          "military": 10,
+          "culture": -5
+        },
+        "flavorText": "中央铸币局铸造的货币在全国流通。你获得了对经济的强大控制力，军事力量也随之增强。"
+      },
+      {
+        "id": "slow-adoption",
+        "title": "缓慢推行",
+        "description": "让货币自然流通，不强制推行，尊重传统习惯。",
+        "effects": {
+          "agriculture": 10,
+          "population": 5,
+          "culture": 10
+        },
+        "flavorText": "货币在民间逐渐被接受，传统的物物交换与货币流通并存。经济平稳发展，文化传统得到尊重。"
+      }
+    ]
+  },
+  {
+    "id": "empire-expansion",
+    "category": "empire",
+    "title": "帝国扩张",
+    "subtitle": "疆域的召唤",
+    "description": "周围的土地肥沃而富饶。你的将军们建议向外扩张，建立一个伟大的帝国。",
+    "imageUrl": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=ancient%20empire%20army%20marching%20conquest%20banners%20epic%20scene&image_size=landscape_16_9",
+    "icon": "Crown",
+    "era": ["imperial", "scientific"],
+    "conditions": [
+      {
+        "type": "stat_above",
+        "stat": "military",
+        "value": 35
+      }
+    ],
+    "baseProbability": 0.2,
+    "choices": [
+      {
+        "id": "military-conquest",
+        "title": "军事征服",
+        "description": "派遣大军征服周边地区，建立广阔的帝国。",
+        "effects": {
+          "military": 25,
+          "population": 15,
+          "agriculture": 10,
+          "culture": -10
+        },
+        "flavorText": "你的军团所向披靡，帝国的疆域不断扩大。被征服的民族带来了新的资源和土地，但反抗和压迫也埋下了隐患。"
+      },
+      {
+        "id": "diplomatic-annexation",
+        "title": "外交合并",
+        "description": "通过外交和联姻手段和平合并周边国家。",
+        "effects": {
+          "population": 20,
+          "culture": 20,
+          "technology": 10,
+          "military": -5
+        },
+        "flavorText": "你通过智慧的外交手段和平地扩展了疆域。不同民族和谐共处，文化交融，帝国繁荣昌盛。"
+      },
+      {
+        "id": "vassal-states",
+        "title": "建立藩属国",
+        "description": "让周边国家成为藩属国，保持其自治但承认你的宗主地位。",
+        "effects": {
+          "military": 15,
+          "agriculture": 15,
+          "culture": 10,
+          "population": 5
+        },
+        "flavorText": "周边国家纷纷成为你的藩属。帝国的影响力扩大了，各方都能保持自己的文化和传统。"
+      }
+    ]
+  },
+  {
+    "id": "famine",
+    "category": "disaster",
+    "title": "大饥荒",
+    "subtitle": "粮食危机",
+    "description": "连续数年的自然灾害导致粮食歉收。饥荒正在蔓延，你的人民面临饥饿的威胁。",
+    "imageUrl": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=drought%20famine%20desperate%20people%20barren%20fields%20dramatic%20sky&image_size=landscape_16_9",
+    "icon": "CloudLightning",
+    "era": ["cognitive", "agricultural", "imperial"],
+    "conditions": [
+      {
+        "type": "stat_below",
+        "stat": "agriculture",
+        "value": 25
+      }
+    ],
+    "baseProbability": 0.22,
+    "choices": [
+      {
+        "id": "import-food",
+        "title": "进口粮食",
+        "description": "用国库储备从邻国紧急进口粮食。",
+        "effects": {
+          "agriculture": -10,
+          "technology": -5,
+          "population": -5
+        },
+        "flavorText": "你花重金从邻国购买粮食。虽然付出了巨大的经济代价，但大多数人熬过了饥荒。"
+      },
+      {
+        "id": "ration-food",
+        "title": "实行配给",
+        "description": "实行严格的粮食配给制度，确保公平分配。",
+        "effects": {
+          "population": -10,
+          "military": 5,
+          "culture": 10
+        },
+        "flavorText": "配给制度在艰难时期，人们在困境中更加团结。"
+      },
+      {
+        "id": "new-crops",
+        "title": "推广新作物",
+        "description": "迅速推广耐旱高产的新作物品种。",
+        "effects": {
+          "agriculture": 10,
+          "population": -15,
+          "technology": 15
+        },
+        "flavorText": "虽然付出了惨痛代价，但新作物最终获得丰收。"
+      }
+    ]
+  },
+  {
+    "id": "barbarian-invasion",
+    "category": "war",
+    "title": "蛮族入侵",
+    "subtitle": "边境危机",
+    "description": "蛮族部落正在边境集结，他们因气候恶化而南下劫掠。你的文明面临严峻的军事考验。",
+    "imageUrl": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=barbarian%20invasion%20warriors%20horses%20battle%20scene%20dramatic&image_size=landscape_16_9",
+    "icon": "Sword",
+    "era": ["agricultural", "imperial"],
+    "conditions": [
+      {
+        "type": "stat_below",
+        "stat": "military",
+        "value": 30
+      }
+    ],
+    "baseProbability": 0.18,
+    "choices": [
+      {
+        "id": "military-resistance",
+        "title": "军事抵抗",
+        "description": "集结军队，坚决抵抗入侵者。",
+        "effects": {
+          "military": 20,
+          "population": -15,
+          "agriculture": -10
+        },
+        "flavorText": "你的军队与蛮族展开激战。虽然付出了惨重代价，但成功击退了入侵者，军队也在战火中得到锤炼。"
+      },
+      {
+        "id": "buy-peace",
+        "title": "花钱买和平",
+        "description": "用财物换取和平，争取时间发展。",
+        "effects": {
+          "agriculture": -20,
+          "technology": 5,
+          "population": 5
+        },
+        "flavorText": "你用大量财物换取了和平。虽然损失了财富，但避免了战争的破坏，为文明得以延续。"
+      },
+      {
+        "id": "hire-mercenaries",
+        "title": "雇佣蛮族",
+        "description": "雇佣蛮族为你作战，以夷制夷。",
+        "effects": {
+          "military": 15,
+          "culture": -10,
+          "population": 5
+        },
+        "flavorText": "你雇佣了蛮族部落为你作战。他们的战斗力很强，但他们的文化也开始影响你的文明。"
+      }
+    ]
+  },
+  {
+    "id": "technological-breakthrough",
+    "category": "innovation",
+    "title": "技术突破",
+    "subtitle": "天才的发明",
+    "description": "一位天才工匠/学者有了革命性的技术突破。这项发明可能彻底改变你的文明。",
+    "imageUrl": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=ancient%20inventor%20laboratory%20discovery%20light%20inspiration&image_size=landscape_16_9",
+    "icon": "Lightbulb",
+    "era": ["cognitive", "agricultural", "imperial", "scientific"],
+    "conditions": [
+      {
+        "type": "stat_above",
+        "stat": "technology",
+        "value": 30
+      }
+    ],
+    "baseProbability": 0.2,
+    "choices": [
+      {
+        "id": "patent-system",
+        "title": "建立专利制度",
+        "description": "建立专利制度保护，鼓励更多。",
+        "effects": {
+          "technology": 25,
+          "culture": 10,
+          "agriculture": 10
+        },
+        "flavorText": "专利制度激发了全民的发明热情。新技术不断涌现，文明在各个领域都取得了。"
+      },
+      {
+        "id": "state-sponsored",
+        "title": "国家资助研发",
+        "description": "由国家出资建立研究院，集中资源推动科技发展。",
+        "effects": {
+          "technology": 30,
+          "military": 10,
+          "agriculture": -10
+        },
+        "flavorText": "国家研究院吸引了各地的学者。集中资源攻关取得了重大突破，但也加重了农业的负担。"
+      },
+      {
+        "id": "share-knowledge",
+        "title": "开放知识共享",
+        "description": "将新知识免费公开，促进全人类的进步。",
+        "effects": {
+          "technology": 15,
+          "culture": 20,
+          "population": 10
+        },
+        "flavorText": "新知识被广泛传播。你的文明成为世界的灯塔，各地学者慕名而来，文化和科技共同繁荣。"
+      }
+    ]
+  }
+]

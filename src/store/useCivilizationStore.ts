@@ -5,8 +5,10 @@ import type {
   CivilizationStats,
   HistoryEntry,
   ChoiceResult,
+  HistoricalEvent,
+  EventResult,
 } from '../types';
-import { fetchAllStages, submitChoice, resetCivilization } from '../utils/api';
+import { fetchAllStages, submitChoice, resetCivilization, checkEventTrigger, resolveEvent } from '../utils/api';
 
 interface CivilizationStore extends CivilizationState {
   stages: Stage[];
@@ -16,6 +18,11 @@ interface CivilizationStore extends CivilizationState {
   isTransitioning: boolean;
   transitionData: ChoiceResult | null;
   showFlavorText: boolean;
+  currentEvent: HistoricalEvent | null;
+  eventResult: EventResult | null;
+  showEventModal: boolean;
+  showEventResult: boolean;
+  eventHistory: HistoryEntry[];
 
   init: () => Promise<void>;
   makeChoice: (choiceId: string) => Promise<void>;
@@ -23,6 +30,10 @@ interface CivilizationStore extends CivilizationState {
   reset: () => Promise<void>;
   setCivilizationName: (name: string) => void;
   closeFlavorText: () => void;
+  checkForEvent: () => Promise<void>;
+  makeEventChoice: (choiceId: string) => Promise<void>;
+  closeEventModal: () => void;
+  closeEventResult: () => void;
 }
 
 const CIVILIZATION_NAMES = [
@@ -61,6 +72,11 @@ export const useCivilizationStore = create<CivilizationStore>((set, get) => ({
   isTransitioning: false,
   transitionData: null,
   showFlavorText: false,
+  currentEvent: null,
+  eventResult: null,
+  showEventModal: false,
+  showEventResult: false,
+  eventHistory: [],
 
   init: async () => {
     set({ isLoading: true, error: null });
@@ -93,7 +109,7 @@ export const useCivilizationStore = create<CivilizationStore>((set, get) => ({
   },
 
   makeChoice: async (choiceId: string) => {
-    const { currentStageId, stats, currentStage, history, civilizationName } = get();
+    const { currentStageId, stats, currentStage, history } = get();
     if (!currentStage) return;
 
     set({ isLoading: true });
@@ -164,6 +180,11 @@ export const useCivilizationStore = create<CivilizationStore>((set, get) => ({
           isTransitioning: false,
           isLoading: false,
           error: null,
+          currentEvent: null,
+          eventResult: null,
+          showEventModal: false,
+          showEventResult: false,
+          eventHistory: [],
         });
       } else {
         throw new Error(response.error || 'Failed to reset');
@@ -182,5 +203,66 @@ export const useCivilizationStore = create<CivilizationStore>((set, get) => ({
 
   closeFlavorText: () => {
     set({ showFlavorText: false });
+  },
+
+  checkForEvent: async () => {
+    const { stats, currentStage, isComplete, showEventModal, showFlavorText, isTransitioning } = get();
+    if (!currentStage || isComplete || showEventModal || showFlavorText || isTransitioning) return;
+
+    try {
+      const response = await checkEventTrigger(stats, currentStage.eraColor);
+      if (response.success && response.data?.shouldTrigger && response.data.event) {
+        set({
+          currentEvent: response.data.event,
+          showEventModal: true,
+        });
+      }
+    } catch (error) {
+      console.error('Failed to check for event:', error);
+    }
+  },
+
+  makeEventChoice: async (choiceId: string) => {
+    const { currentEvent, stats, eventHistory } = get();
+    if (!currentEvent) return;
+
+    set({ isLoading: true });
+    try {
+      const response = await resolveEvent(currentEvent.id, choiceId, stats);
+      if (response.success && response.data) {
+        const choice = currentEvent.choices.find((c) => c.id === choiceId)!;
+        const newHistoryEntry: HistoryEntry = {
+          stageId: `event-${currentEvent.id}`,
+          choiceId,
+          timestamp: Date.now(),
+          stageTitle: currentEvent.title,
+          choiceTitle: choice.title,
+        };
+
+        set({
+          eventResult: response.data,
+          stats: response.data.newStats,
+          showEventModal: false,
+          showEventResult: true,
+          eventHistory: [...eventHistory, newHistoryEntry],
+          isLoading: false,
+        });
+      } else {
+        throw new Error(response.error || 'Failed to process event choice');
+      }
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error.message : 'Unknown error',
+        isLoading: false,
+      });
+    }
+  },
+
+  closeEventModal: () => {
+    set({ showEventModal: false, currentEvent: null });
+  },
+
+  closeEventResult: () => {
+    set({ showEventResult: false, eventResult: null });
   },
 }));

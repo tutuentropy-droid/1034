@@ -14,6 +14,7 @@ import { fileURLToPath } from 'url'
 import authRoutes from './routes/auth.js'
 import stagesRoutes from './controllers/stagesController.js'
 import civilizationRoutes from './controllers/civilizationController.js'
+import eventsRoutes from './controllers/eventsController.js'
 
 // for esm mode
 const __filename = fileURLToPath(import.meta.url)
@@ -34,6 +35,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }))
 app.use('/api/auth', authRoutes)
 app.use('/api/stages', stagesRoutes)
 app.use('/api/civilization', civilizationRoutes)
+app.use('/api/events', eventsRoutes)
 
 /**
  * health
