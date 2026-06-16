@@ -9,13 +9,14 @@ import TransitionOverlay from '../components/TransitionOverlay';
 import FlavorTextModal from '../components/FlavorTextModal';
 import EventCardModal from '../components/EventCardModal';
 import EventResultModal from '../components/EventResultModal';
-import { RotateCcw, BookOpen, Globe, Library } from 'lucide-react';
+import { RotateCcw, BookOpen, Globe, Library, Users, Swords } from 'lucide-react';
 
 interface HeaderProps {
   onEnterEncyclopedia: () => void;
+  onEnterMultiCiv: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ onEnterEncyclopedia }) => {
+const Header: React.FC<HeaderProps> = ({ onEnterEncyclopedia, onEnterMultiCiv }) => {
   const { reset, isLoading, civilizationName } = useCivilizationStore();
 
   return (
@@ -41,6 +42,22 @@ const Header: React.FC<HeaderProps> = ({ onEnterEncyclopedia }) => {
           </div>
 
           <div className="flex items-center gap-4">
+            <button
+              onClick={onEnterMultiCiv}
+              className="
+                group flex items-center gap-2 px-5 py-3
+                bg-gradient-to-r from-blue-500 to-indigo-600
+                hover:from-blue-600 hover:to-indigo-700
+                text-white font-serif font-bold
+                rounded-xl border-2 border-blue-400
+                shadow-sm hover:shadow-lg
+                transition-all duration-300
+              "
+            >
+              <Users className="w-5 h-5" />
+              <span className="hidden sm:inline">多文明竞争</span>
+            </button>
+
             <button
               onClick={onEnterEncyclopedia}
               className="
@@ -83,15 +100,28 @@ const Header: React.FC<HeaderProps> = ({ onEnterEncyclopedia }) => {
           </div>
         </div>
 
-        <div className="mt-6 p-4 bg-parchment-100/60 rounded-xl border border-parchment-300 backdrop-blur-sm">
-          <div className="flex items-start gap-3">
-            <BookOpen className="w-5 h-5 text-ochre-600 flex-shrink-0 mt-0.5" />
-            <p className="text-ochre-600/90 text-sm leading-relaxed font-sans">
-              欢迎来到人类文明的历史长河。你将从石器时代的部落开始，在每个关键的历史节点做出选择，
-              引领你的文明走过认知革命、农业革命、帝国时代，最终到达科学革命的现代。
-              每个选择都会影响文明的发展方向——人口、科技、文化、军事、农业，
-              五维属性将记录你的文明特质。准备好了吗？历史的卷轴正在展开...
-            </p>
+        <div className="mt-6 grid md:grid-cols-2 gap-4">
+          <div className="p-4 bg-parchment-100/60 rounded-xl border border-parchment-300 backdrop-blur-sm">
+            <div className="flex items-start gap-3">
+              <BookOpen className="w-5 h-5 text-ochre-600 flex-shrink-0 mt-0.5" />
+              <p className="text-ochre-600/90 text-sm leading-relaxed font-sans">
+                <strong>经典模式：</strong>从石器时代的部落开始，在每个关键的历史节点做出选择，
+                引领你的文明走过认知革命、农业革命、帝国时代，最终到达科学革命的现代。
+                每个选择都会影响文明的发展方向——人口、科技、文化、军事、农业，
+                五维属性将记录你的文明特质。
+              </p>
+            </div>
+          </div>
+
+          <div className="p-4 bg-blue-50/60 rounded-xl border border-blue-200 backdrop-blur-sm">
+            <div className="flex items-start gap-3">
+              <Swords className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+              <p className="text-blue-700/90 text-sm leading-relaxed font-sans">
+                <strong>多文明竞争模式：</strong>与AI文明共同发展！贸易、战争、联盟、文化传播，
+                每回合AI根据规则自动决策。你需要发展自己的文明，扩张领土，
+                在世界舞台上与其他文明竞争，最终成为世界霸主！
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -133,9 +163,10 @@ const ErrorScreen: React.FC<{ message: string; onRetry: () => void }> = ({ messa
 
 interface HomeProps {
   onEnterEncyclopedia: () => void;
+  onEnterMultiCiv: () => void;
 }
 
-const Home: React.FC<HomeProps> = ({ onEnterEncyclopedia }) => {
+const Home: React.FC<HomeProps> = ({ onEnterEncyclopedia, onEnterMultiCiv }) => {
   const {
     init,
     isLoading,
@@ -191,7 +222,7 @@ const Home: React.FC<HomeProps> = ({ onEnterEncyclopedia }) => {
 
   return (
     <div className="min-h-screen">
-      <Header onEnterEncyclopedia={onEnterEncyclopedia} />
+      <Header onEnterEncyclopedia={onEnterEncyclopedia} onEnterMultiCiv={onEnterMultiCiv} />
 
       <main className="pb-16">
         <Timeline />

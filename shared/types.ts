@@ -199,3 +199,152 @@ export interface QuizResponse extends ApiResponse<QuizQuestion[]> {}
 export interface QuizSubmitResponse extends ApiResponse<QuizResult[]> {}
 export interface FavoritesResponse extends ApiResponse<UserFavorite[]> {}
 export interface GraphResponse extends ApiResponse<KnowledgeGraph> {}
+
+export type CivilizationTrait = 'aggressive' | 'peaceful' | 'trader' | 'cultural' | 'expansionist' | 'defensive';
+export type DiplomaticStatus = 'neutral' | 'allied' | 'at_war' | 'trading_partner' | 'hostile';
+export type TileTerrain = 'plains' | 'forest' | 'mountain' | 'desert' | 'coast' | 'river' | 'tundra';
+export type ActionType = 'expand_territory' | 'build_military' | 'develop_technology' | 'develop_culture' | 'develop_agriculture' | 'trade' | 'declare_war' | 'propose_alliance' | 'spread_culture' | 'defense';
+
+export interface MapTile {
+  id: string;
+  x: number;
+  y: number;
+  terrain: TileTerrain;
+  ownerId: string | null;
+  population: number;
+  resources: Partial<CivilizationStats>;
+  isCapital: boolean;
+}
+
+export interface DiplomaticRelation {
+  withId: string;
+  status: DiplomaticStatus;
+  opinion: number;
+  tradeAgreement: boolean;
+  lastInteraction: number;
+}
+
+export type EraStage = 'stoneAge' | 'agricultural' | 'imperial' | 'scientific';
+
+export interface EraThreshold {
+  era: EraStage;
+  minPopulation: number;
+  minTechnology: number;
+  minCulture: number;
+  name: string;
+  description: string;
+}
+
+export interface CivilizationRanking {
+  civilizationId: string;
+  totalScore: number;
+  territoryScore: number;
+  militaryScore: number;
+  cultureScore: number;
+  technologyScore: number;
+  rank: number;
+}
+
+export interface TerritoryExpansion {
+  civilizationId: string;
+  tileId: string;
+  turn: number;
+  fromTileId: string;
+}
+
+export interface AICivilization {
+  id: string;
+  name: string;
+  color: string;
+  stats: CivilizationStats;
+  territory: string[];
+  capitalTileId: string;
+  traits: CivilizationTrait[];
+  relations: DiplomaticRelation[];
+  era: EraStage;
+  personality: {
+    aggressiveness: number;
+    friendliness: number;
+    greed: number;
+    culturalFocus: number;
+    techFocus: number;
+  };
+  actionHistory: { turn: number; action: string; targetId?: string }[];
+  expansionHistory: TerritoryExpansion[];
+}
+
+export interface PlayerCivilization extends AICivilization {
+  isPlayer: true;
+}
+
+export interface WorldMap {
+  width: number;
+  height: number;
+  tiles: MapTile[];
+  continents: { id: string; name: string; tileIds: string[] }[];
+}
+
+export interface AIAction {
+  type: ActionType;
+  civilizationId: string;
+  targetId?: string;
+  tileId?: string;
+}
+
+export interface TurnEvent {
+  id: string;
+  turn: number;
+  type: ActionType | 'diplomacy' | 'battle' | 'culture_spread';
+  actorId: string;
+  targetId?: string;
+  description: string;
+  effects: { civilizationId: string; stats: Partial<CivilizationStats>; territoryGained?: string[]; territoryLost?: string[] }[];
+}
+
+export interface WorldState {
+  turn: number;
+  civilizations: AICivilization[];
+  playerCivilizationId: string;
+  map: WorldMap;
+  turnEvents: TurnEvent[];
+  gameOver: boolean;
+  winnerId: string | null;
+  rankings: CivilizationRanking[];
+  recentExpansions: TerritoryExpansion[];
+}
+
+export interface AIDecision {
+  priority: number;
+  action: AIAction;
+  reasoning: string;
+}
+
+export interface BattleResult {
+  attackerId: string;
+  defenderId: string;
+  attackerLosses: number;
+  defenderLosses: number;
+  winner: string;
+  capturedTiles: string[];
+}
+
+export interface TradeAgreement {
+  id: string;
+  civ1Id: string;
+  civ2Id: string;
+  civ1Offers: Partial<CivilizationStats>;
+  civ2Offers: Partial<CivilizationStats>;
+  duration: number;
+  turnsRemaining: number;
+}
+
+export interface CultureSpreadResult {
+  fromId: string;
+  toId: string;
+  influence: number;
+  convertedTiles: string[];
+}
+
+export interface WorldStateResponse extends ApiResponse<WorldState> {}
+export interface AIDecisionResponse extends ApiResponse<AIAction> {}
+export interface BattleResultResponse extends ApiResponse<BattleResult> {}

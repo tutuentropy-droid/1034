@@ -4,6 +4,7 @@ import Home from '@/pages/Home';
 import { EncyclopediaHome } from '@/components/EncyclopediaHome';
 import { KnowledgeNodeDetail } from '@/components/KnowledgeNodeDetail';
 import { KnowledgeGraph } from '@/components/KnowledgeGraph';
+import { MultiCivGame } from '@/components/MultiCivGame';
 import { useEncyclopediaStore } from '@/store/useEncyclopediaStore';
 
 function EncyclopediaMode({ onExit }: { onExit: () => void }) {
@@ -42,14 +43,22 @@ function EncyclopediaMode({ onExit }: { onExit: () => void }) {
 }
 
 export default function App() {
-  const [mode, setMode] = useState<'game' | 'encyclopedia'>('game');
+  const [mode, setMode] = useState<'game' | 'encyclopedia' | 'multiCiv'>('game');
 
   const handleEnterEncyclopedia = () => {
     useEncyclopediaStore.getState().setCurrentView('home');
     setMode('encyclopedia');
   };
 
+  const handleEnterMultiCiv = () => {
+    setMode('multiCiv');
+  };
+
   const handleExitEncyclopedia = () => {
+    setMode('game');
+  };
+
+  const handleExitMultiCiv = () => {
     setMode('game');
   };
 
@@ -61,8 +70,10 @@ export default function App() {
           element={
             mode === 'encyclopedia' ? (
               <EncyclopediaMode onExit={handleExitEncyclopedia} />
+            ) : mode === 'multiCiv' ? (
+              <MultiCivGame onExit={handleExitMultiCiv} />
             ) : (
-              <Home onEnterEncyclopedia={handleEnterEncyclopedia} />
+              <Home onEnterEncyclopedia={handleEnterEncyclopedia} onEnterMultiCiv={handleEnterMultiCiv} />
             )
           }
         />
