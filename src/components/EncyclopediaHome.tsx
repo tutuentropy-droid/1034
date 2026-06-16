@@ -12,6 +12,7 @@ export function EncyclopediaHome({ onExit }: EncyclopediaHomeProps) {
   const {
     init,
     nodes,
+    allNodes,
     tags,
     isLoading,
     error,
@@ -34,10 +35,10 @@ export function EncyclopediaHome({ onExit }: EncyclopediaHomeProps) {
 
   const displayNodes = useMemo(() => {
     if (currentView === 'favorites') {
-      return nodes.filter(n => favoriteNodeIds.has(n.id));
+      return allNodes.filter(n => favoriteNodeIds.has(n.id));
     }
     return nodes;
-  }, [nodes, currentView, favoriteNodeIds]);
+  }, [nodes, allNodes, currentView, favoriteNodeIds]);
 
   const tagMap = useMemo(() => {
     return new Map(tags.map((t: Tag) => [t.id, t]));

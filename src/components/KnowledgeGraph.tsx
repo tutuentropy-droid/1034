@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { useEncyclopediaStore } from '../store/useEncyclopediaStore';
 import type { GraphNode, GraphEdge } from '../types';
 
@@ -6,6 +6,7 @@ export function KnowledgeGraph() {
   const { graph, nodes, loadNode, goBack } = useEncyclopediaStore();
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const viewBox = useMemo(() => {
     if (!graph) return '0 0 800 500';
@@ -136,13 +137,38 @@ export function KnowledgeGraph() {
             );
             const shouldShow = !hoveredNode || isHovered || hasRelation;
 
+            const handleMouseEnter = () => {
+              if (hoverTimeoutRef.current) {
+                clearTimeout(hoverTimeoutRef.current);
+                hoverTimeoutRef.current = null;
+              }
+              setHoveredNode(node.id);
+            };
+
+            const handleMouseLeave = () => {
+              hoverTimeoutRef.current = setTimeout(() => {
+                setHoveredNode(null);
+              }, 200);
+            };
+
+            const handlePopupMouseEnter = () => {
+              if (hoverTimeoutRef.current) {
+                clearTimeout(hoverTimeoutRef.current);
+                hoverTimeoutRef.current = null;
+              }
+            };
+
+            const handlePopupMouseLeave = () => {
+              setHoveredNode(null);
+            };
+
             return (
               <g
                 key={node.id}
                 className="cursor-pointer"
                 onClick={() => handleNodeClick(node.id)}
-                onMouseEnter={() => setHoveredNode(node.id)}
-                onMouseLeave={() => setHoveredNode(null)}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
                 style={{
                   opacity: shouldShow ? 1 : 0.3,
                   transition: 'all 0.3s ease',
@@ -162,6 +188,9 @@ export function KnowledgeGraph() {
                   textAnchor="middle"
                   dominantBaseline="middle"
                   fill="white"
+                  stroke="#000"
+                  strokeWidth="0.5"
+                  paintOrder="stroke"
                   fontSize={isHovered || isSelected ? 11 : 10}
                   fontWeight="bold"
                   className="pointer-events-none"
@@ -170,7 +199,15 @@ export function KnowledgeGraph() {
                 </text>
 
                 {isHovered && (
-                  <g>
+                  <g
+                    onMouseEnter={handlePopupMouseEnter}
+                    onMouseLeave={handlePopupMouseLeave}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleNodeClick(node.id);
+                    }}
+                    className="cursor-pointer"
+                  >
                     <rect
                       x={node.x - 90}
                       y={node.y + node.size + 10}
@@ -189,7 +226,6 @@ export function KnowledgeGraph() {
                       fill="#1E293B"
                       fontSize="12"
                       fontWeight="600"
-                      className="pointer-events-none"
                     >
                       {getNodeDetail(node.id)?.title || node.id}
                     </text>
@@ -199,9 +235,8 @@ export function KnowledgeGraph() {
                       textAnchor="middle"
                       fill="#64748B"
                       fontSize="10"
-                      className="pointer-events-none"
                     >
-                      点击查看详情
+                      点击查看详情 →
                     </text>
                   </g>
                 )}

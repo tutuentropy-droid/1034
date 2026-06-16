@@ -22,6 +22,7 @@ import {
 
 interface EncyclopediaStore {
   nodes: KnowledgeNode[];
+  allNodes: KnowledgeNode[];
   tags: Tag[];
   currentNode: KnowledgeNode | null;
   quizzes: QuizQuestion[];
@@ -55,6 +56,7 @@ interface EncyclopediaStore {
 
 export const useEncyclopediaStore = create<EncyclopediaStore>((set, get) => ({
   nodes: [],
+  allNodes: [],
   tags: [],
   currentNode: null,
   quizzes: [],
@@ -86,7 +88,11 @@ export const useEncyclopediaStore = create<EncyclopediaStore>((set, get) => ({
     try {
       const response = await fetchAllKnowledgeNodes(tagFilter);
       if (response.success && response.data) {
-        set({ nodes: response.data, selectedTag: tagFilter || null });
+        set({ 
+          nodes: response.data, 
+          selectedTag: tagFilter || null,
+          ...(tagFilter ? {} : { allNodes: response.data })
+        });
       } else {
         throw new Error(response.error || 'Failed to load nodes');
       }
