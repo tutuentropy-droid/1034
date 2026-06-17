@@ -22,6 +22,8 @@ import {
   Sparkles,
   AlertTriangle,
   Info,
+  Lock,
+  Link2,
 } from 'lucide-react';
 
 const ICON_MAP: Record<string, React.ReactNode> = {
@@ -63,37 +65,58 @@ interface WhatIfSandboxProps {
 const NodeCard: React.FC<{
   nodeId: string;
 }> = ({ nodeId }) => {
-  const { nodes, alteredNodeIds, toggleNode, selectedNodeId, setSelectedNodeId } = useWhatIfStore();
+  const { nodes, alteredNodeIds, toggleNode, selectedNodeId, setSelectedNodeId, canToggleNode, isChainedAltered } = useWhatIfStore();
   const node = nodes.find((n) => n.id === nodeId);
   if (!node) return null;
 
   const isAltered = alteredNodeIds.has(nodeId);
   const isSelected = selectedNodeId === nodeId;
+  const { canAlter, reason } = canToggleNode(nodeId);
+  const chained = isChainedAltered(nodeId);
+  const isLocked = !isAltered && !canAlter;
 
   return (
     <div
       className={`
-        relative group cursor-pointer transition-all duration-500
-        ${isAltered ? 'scale-[1.02]' : ''}
+        relative group transition-all duration-500
+        ${isAltered && !chained ? 'scale-[1.02]' : ''}
+        ${isLocked ? 'opacity-60' : 'cursor-pointer'}
         ${isSelected ? 'ring-4 ring-amber-400 ring-offset-2 ring-offset-transparent' : ''}
       `}
-      onClick={() => setSelectedNodeId(isSelected ? null : nodeId)}
+      onClick={() => {
+        if (!isLocked) {
+          setSelectedNodeId(isSelected ? null : nodeId);
+        }
+      }}
     >
       <div
         className={`
           relative overflow-hidden rounded-2xl border-2
           transition-all duration-500
           ${isAltered
-            ? `${ERA_ACCENT[node.eraColor]} bg-gradient-to-br from-red-50 to-orange-50 shadow-2xl shadow-red-200/50`
-            : `border-parchment-300 bg-card-gradient shadow-card hover:shadow-2xl`
+            ? chained
+              ? `border-amber-400 bg-gradient-to-br from-amber-50 to-yellow-50 shadow-xl shadow-amber-100/50`
+              : `${ERA_ACCENT[node.eraColor]} bg-gradient-to-br from-red-50 to-orange-50 shadow-2xl shadow-red-200/50`
+            : isLocked
+              ? 'border-parchment-300 bg-parchment-100/50 shadow-sm'
+              : `border-parchment-300 bg-card-gradient shadow-card hover:shadow-2xl`
           }
         `}
       >
         {isAltered && (
           <div className="absolute top-3 right-3 z-10">
-            <div className="flex items-center gap-1 px-3 py-1 bg-red-500 text-white text-xs font-bold rounded-full animate-pulse">
-              <AlertTriangle className="w-3 h-3" />
-              已改变
+            <div className={`flex items-center gap-1 px-3 py-1 text-white text-xs font-bold rounded-full ${chained ? 'bg-amber-500' : 'bg-red-500 animate-pulse'}`}>
+              {chained ? <Link2 className="w-3 h-3" /> : <AlertTriangle className="w-3 h-3" />}
+              {chained ? '连锁改变' : '已改变'}
+            </div>
+          </div>
+        )}
+
+        {isLocked && (
+          <div className="absolute top-3 right-3 z-10">
+            <div className="flex items-center gap-1 px-3 py-1 bg-parchment-400 text-white text-xs font-bold rounded-full">
+              <Lock className="w-3 h-3" />
+              未解锁
             </div>
           </div>
         )}
@@ -102,44 +125,49 @@ const NodeCard: React.FC<{
           <img
             src={node.imageUrl}
             alt={node.title}
-            className={`w-full h-full object-cover transition-transform duration-700 ${isSelected ? 'scale-110' : 'group-hover:scale-105'}`}
+            className={`w-full h-full object-cover transition-transform duration-700 ${isLocked ? 'grayscale' : ''} ${isSelected ? 'scale-110' : 'group-hover:scale-105'}`}
           />
-          <div className={`absolute inset-0 bg-gradient-to-t ${ERA_BG[node.eraColor]} opacity-60`} />
+          <div className={`absolute inset-0 bg-gradient-to-t ${ERA_BG[node.eraColor]} ${isLocked ? 'opacity-30' : 'opacity-60'}`} />
           <div className="absolute bottom-3 left-3 flex items-center gap-2">
-            <div className={`w-10 h-10 rounded-xl ${ERA_BADGE[node.eraColor]} flex items-center justify-center text-white shadow-lg`}>
+            <div className={`w-10 h-10 rounded-xl ${isLocked ? 'bg-parchment-400' : ERA_BADGE[node.eraColor]} flex items-center justify-center text-white shadow-lg`}>
               {ICON_MAP[node.icon]}
             </div>
             <div>
               <p className="text-white/80 text-xs font-medium">{node.yearLabel}</p>
-              <h3 className="text-white font-serif font-bold text-lg">{node.title}</h3>
+              <h3 className={`font-serif font-bold text-lg ${isLocked ? 'text-white/70' : 'text-white'}`}>{node.title}</h3>
             </div>
           </div>
         </div>
 
         <div className="p-4">
-          <div className={`inline-block px-2 py-0.5 rounded text-xs font-medium mb-2 ${ERA_BADGE[node.eraColor]} text-white`}>
+          <div className={`inline-block px-2 py-0.5 rounded text-xs font-medium mb-2 ${isLocked ? 'bg-parchment-300 text-parchment-500' : ERA_BADGE[node.eraColor]} text-white`}>
             {node.era}
           </div>
-          <p className="text-ochre-600/80 text-sm leading-relaxed line-clamp-2">{node.subtitle}</p>
+          <p className={`text-sm leading-relaxed line-clamp-2 ${isLocked ? 'text-ochre-400' : 'text-ochre-600/80'}`}>{node.subtitle}</p>
 
           <div className="mt-3 flex items-center justify-between">
-            <span className={`text-xs font-bold ${isAltered ? 'text-red-600' : 'text-green-700'}`}>
-              {isAltered ? '⚡ 已偏离历史' : '✓ 遵循历史'}
+            <span className={`text-xs font-bold ${chained ? 'text-amber-600' : isAltered ? 'text-red-600' : isLocked ? 'text-ochre-400' : 'text-green-700'}`}>
+              {chained ? '🔗 多米诺效应' : isAltered ? '⚡ 已偏离历史' : isLocked ? '🔒 需解锁前置' : '✓ 遵循历史'}
             </span>
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 toggleNode(nodeId);
               }}
+              disabled={!canAlter}
               className={`
                 px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-300
                 ${isAltered
-                  ? 'bg-parchment-200 text-ochre-700 hover:bg-parchment-300 border border-parchment-400'
-                  : `bg-gradient-to-r ${ERA_BG[node.eraColor]} text-white hover:opacity-90 shadow-md`
+                  ? chained
+                    ? 'bg-amber-100 text-amber-700 cursor-not-allowed border border-amber-200'
+                    : 'bg-parchment-200 text-ochre-700 hover:bg-parchment-300 border border-parchment-400'
+                  : isLocked
+                    ? 'bg-parchment-200 text-parchment-400 cursor-not-allowed border border-parchment-300'
+                    : `bg-gradient-to-r ${ERA_BG[node.eraColor]} text-white hover:opacity-90 shadow-md`
                 }
               `}
             >
-              {isAltered ? '恢复历史' : '改变历史'}
+              {isAltered ? (chained ? '连锁触发' : '恢复历史') : isLocked ? '🔒 未解锁' : '改变历史'}
             </button>
           </div>
         </div>
@@ -159,7 +187,25 @@ const NodeCard: React.FC<{
             </div>
           </div>
 
-          {isAltered && (
+          {chained && (
+            <div className="mb-3 p-2 bg-amber-50 rounded-lg border border-amber-200">
+              <p className="text-xs text-amber-700 font-medium flex items-center gap-1">
+                <Link2 className="w-3 h-3" />
+                {reason}
+              </p>
+            </div>
+          )}
+
+          {isLocked && (
+            <div className="mb-3 p-2 bg-parchment-100 rounded-lg border border-parchment-300">
+              <p className="text-xs text-ochre-500 font-medium flex items-center gap-1">
+                <Lock className="w-3 h-3" />
+                {reason}
+              </p>
+            </div>
+          )}
+
+          {isAltered && !chained && (
             <div className="space-y-2">
               <div className="flex items-start gap-2">
                 <Sparkles className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
@@ -302,12 +348,14 @@ const SimulationResultPanel: React.FC = () => {
 };
 
 export const WhatIfSandbox: React.FC<WhatIfSandboxProps> = ({ onExit }) => {
-  const { nodes, alteredNodeIds, simulate, resetAll, currentView, setCurrentView, isSimulating, simulationResult, savedRoutes } = useWhatIfStore();
+  const { nodesSorted, alteredNodeIds, manualAlteredIds, simulate, resetAll, currentView, setCurrentView, isSimulating, simulationResult, savedRoutes } = useWhatIfStore();
   const [filterEra, setFilterEra] = useState<string>('all');
 
   const alteredCount = alteredNodeIds.size;
-  const eras = ['all', ...new Set(nodes.map((n) => n.era))];
-  const filteredNodes = filterEra === 'all' ? nodes : nodes.filter((n) => n.era === filterEra);
+  const manualCount = manualAlteredIds.size;
+  const chainedCount = alteredCount - manualCount;
+  const eras = ['all', '认知革命', '农业革命', '帝国时代', '科学革命'];
+  const filteredNodes = filterEra === 'all' ? nodesSorted : nodesSorted.filter((n) => n.era === filterEra);
 
   if (currentView === 'timeline') {
     return <WhatIfTimeline onBack={() => setCurrentView('sandbox')} />;
@@ -410,9 +458,17 @@ export const WhatIfSandbox: React.FC<WhatIfSandboxProps> = ({ onExit }) => {
           </div>
 
           <div className="flex items-center gap-3">
-            <span className="text-sm text-ochre-600">
-              已改变 <strong className="text-red-600">{alteredCount}</strong> / {nodes.length} 个节点
-            </span>
+            <div className="flex items-center gap-3 text-sm">
+              <span className="text-ochre-600">
+                共改变 <strong className="text-red-600">{alteredCount}</strong> / {nodesSorted.length} 个节点
+              </span>
+              {chainedCount > 0 && (
+                <span className="flex items-center gap-1 text-amber-600">
+                  <Link2 className="w-3 h-3" />
+                  其中 {chainedCount} 个为连锁效应
+                </span>
+              )}
+            </div>
             <button
               onClick={simulate}
               disabled={isSimulating}

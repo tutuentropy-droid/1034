@@ -31,11 +31,12 @@ interface WhatIfTimelineProps {
 }
 
 export const WhatIfTimeline: React.FC<WhatIfTimelineProps> = ({ onBack }) => {
-  const { nodes, alteredNodeIds, simulationResult } = useWhatIfStore();
+  const { nodesSorted, alteredNodeIds, simulationResult, isChainedAltered } = useWhatIfStore();
 
-  const timelineEntries = nodes.map((node) => {
+  const timelineEntries = nodesSorted.map((node) => {
     const isAltered = alteredNodeIds.has(node.id);
-    return { node, isAltered };
+    const chained = isChainedAltered(node.id);
+    return { node, isAltered, chained };
   });
 
   const alteredCount = alteredNodeIds.size;
@@ -89,11 +90,18 @@ export const WhatIfTimeline: React.FC<WhatIfTimelineProps> = ({ onBack }) => {
               <div>
                 <h3 className="font-serif text-lg font-bold text-red-800 mb-2">历史分叉点</h3>
                 <div className="flex flex-wrap gap-2">
-                  {Array.from(alteredNodeIds).map((nodeId) => {
-                    const node = nodes.find((n) => n.id === nodeId);
-                    if (!node) return null;
+                  {timelineEntries.filter(e => e.isAltered).map((entry) => {
+                    const { node, chained } = entry;
                     return (
-                      <span key={nodeId} className="px-3 py-1 bg-red-100 text-red-700 text-sm font-medium rounded-full border border-red-200">
+                      <span
+                        key={node.id}
+                        className={`px-3 py-1 text-sm font-medium rounded-full border ${
+                          chained
+                            ? 'bg-amber-100 text-amber-700 border-amber-300'
+                            : 'bg-red-100 text-red-700 border-red-200'
+                        }`}
+                      >
+                        {chained && '🔗 '}
                         {node.alteration.title.replace('如果', '')}
                       </span>
                     );
@@ -109,12 +117,18 @@ export const WhatIfTimeline: React.FC<WhatIfTimelineProps> = ({ onBack }) => {
 
           <div className="space-y-6">
             {timelineEntries.map((entry, index) => {
-              const { node, isAltered } = entry;
+              const { node, isAltered, chained } = entry;
               const colors = ERA_COLORS[node.eraColor] || ERA_COLORS.stoneAge;
 
               return (
                 <div key={node.id} className="relative pl-20 animate-timelineReveal" style={{ animationDelay: `${index * 100}ms` }}>
-                  <div className={`absolute left-5 top-4 w-7 h-7 rounded-full border-3 border-white shadow-lg flex items-center justify-center ${colors.dot}`}>
+                  <div className={`absolute left-5 top-4 w-7 h-7 rounded-full border-3 border-white shadow-lg flex items-center justify-center ${
+                    isAltered
+                      ? chained
+                        ? 'bg-amber-500'
+                        : `${colors.dot}`
+                      : `${colors.dot}`
+                  }`}>
                     {isAltered ? (
                       <GitBranch className="w-3 h-3 text-white" />
                     ) : (
@@ -123,30 +137,44 @@ export const WhatIfTimeline: React.FC<WhatIfTimelineProps> = ({ onBack }) => {
                   </div>
 
                   {isAltered && (
-                    <div className="absolute left-12 top-0 bottom-0 w-0.5 bg-red-300 border-l-2 border-dashed border-red-300" />
+                    <div className={`absolute left-12 top-0 bottom-0 w-0.5 border-l-2 border-dashed ${
+                      chained ? 'border-amber-300' : 'border-red-300'
+                    }`} />
                   )}
 
                   <div className={`
                     rounded-2xl border-2 overflow-hidden shadow-lg
                     transition-all duration-500
                     ${isAltered
-                      ? 'border-red-300 bg-gradient-to-br from-red-50 to-amber-50 shadow-red-100'
+                      ? chained
+                        ? 'border-amber-300 bg-gradient-to-br from-amber-50 to-yellow-50 shadow-amber-100'
+                        : 'border-red-300 bg-gradient-to-br from-red-50 to-amber-50 shadow-red-100'
                       : `${colors.border} ${colors.bg} shadow-sm`
                     }
                   `}>
                     <div className="p-5">
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex items-center gap-3">
-                          <div className={`w-8 h-8 rounded-lg ${colors.dot} flex items-center justify-center text-white`}>
+                          <div className={`w-8 h-8 rounded-lg ${isAltered && chained ? 'bg-amber-500' : colors.dot} flex items-center justify-center text-white`}>
                             {ERA_ICONS[node.eraColor]}
                           </div>
                           <div>
                             <div className="flex items-center gap-2">
-                              <h3 className={`font-serif text-xl font-bold ${isAltered ? 'text-red-800' : colors.text}`}>
+                              <h3 className={`font-serif text-xl font-bold ${
+                                isAltered
+                                  ? chained
+                                    ? 'text-amber-800'
+                                    : 'text-red-800'
+                                  : colors.text
+                              }`}>
                                 {isAltered ? node.alteration.title : node.title}
                               </h3>
                               {isAltered && (
-                                <span className="px-2 py-0.5 bg-red-500 text-white text-xs font-bold rounded-full">改变</span>
+                                <span className={`px-2 py-0.5 text-white text-xs font-bold rounded-full ${
+                                  chained ? 'bg-amber-500' : 'bg-red-500'
+                                }`}>
+                                  {chained ? '连锁' : '改变'}
+                                </span>
                               )}
                             </div>
                             <p className="text-xs text-ochre-500 flex items-center gap-1">

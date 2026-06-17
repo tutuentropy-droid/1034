@@ -18,8 +18,44 @@ const BASE_STATS: CivilizationStats = {
 
 const ERA_ORDER = ['认知革命', '农业革命', '帝国时代', '科学革命'];
 
+function parseYearLabel(yearLabel: string): number {
+  const clean = yearLabel.replace(/,/g, '');
+  const bcMatch = clean.match(/公元前(\d+(\.\d+)?)年/);
+  if (bcMatch) {
+    return -parseFloat(bcMatch[1]);
+  }
+  const adMatch = clean.match(/(?:公元)?(\d+(\.\d+)?)年/);
+  if (adMatch) {
+    return parseFloat(adMatch[1]);
+  }
+  return 0;
+}
+
+function computeFullAltered(manualIds: Set<string>, nodes: WhatIfNode[]): Set<string> {
+  const full = new Set(manualIds);
+  const queue = [...manualIds];
+
+  while (queue.length > 0) {
+    const nodeId = queue.shift()!;
+    for (const node of nodes) {
+      if (!full.has(node.id) && node.dependencies.includes(nodeId)) {
+        full.add(node.id);
+        queue.push(node.id);
+      }
+    }
+  }
+
+  return full;
+}
+
+function sortNodesChronologically(nodes: WhatIfNode[]): WhatIfNode[] {
+  return [...nodes].sort((a, b) => parseYearLabel(a.yearLabel) - parseYearLabel(b.yearLabel));
+}
+
 interface WhatIfStore {
   nodes: WhatIfNode[];
+  nodesSorted: WhatIfNode[];
+  manualAlteredIds: Set<string>;
   alteredNodeIds: Set<string>;
   simulationResult: WhatIfSimulationResult | null;
   savedRoutes: WhatIfRoute[];
@@ -28,6 +64,8 @@ interface WhatIfStore {
   selectedNodeId: string | null;
 
   toggleNode: (nodeId: string) => void;
+  canToggleNode: (nodeId: string) => { canAlter: boolean; reason: string };
+  isChainedAltered: (nodeId: string) => boolean;
   resetAll: () => void;
   simulate: () => void;
   saveCurrentRoute: () => void;
@@ -52,10 +90,11 @@ function calculateStats(alteredNodeIds: Set<string>): CivilizationStats {
   return stats;
 }
 
-function generateTimeline(alteredNodeIds: Set<string>): WhatIfTimelineEntry[] {
+function generateTimeline(alteredNodeIds: Set<string>, nodes: WhatIfNode[]): WhatIfTimelineEntry[] {
   const timeline: WhatIfTimelineEntry[] = [];
+  const sortedNodes = sortNodesChronologically(nodes);
 
-  for (const node of whatIfNodes) {
+  for (const node of sortedNodes) {
     const isAltered = alteredNodeIds.has(node.id);
     const effects = isAltered ? node.effects.off : node.effects.on;
 
@@ -166,6 +205,8 @@ function calculateDivergenceScore(alteredNodeIds: Set<string>): number {
 
 export const useWhatIfStore = create<WhatIfStore>((set, get) => ({
   nodes: whatIfNodes,
+  nodesSorted: sortNodesChronologically(whatIfNodes),
+  manualAlteredIds: new Set<string>(),
   alteredNodeIds: new Set<string>(),
   simulationResult: null,
   savedRoutes: [],
@@ -173,28 +214,62 @@ export const useWhatIfStore = create<WhatIfStore>((set, get) => ({
   isSimulating: false,
   selectedNodeId: null,
 
-  toggleNode: (nodeId: string) => {
-    const { alteredNodeIds, nodes } = get();
-    const newAltered = new Set(alteredNodeIds);
+  canToggleNode: (nodeId: string) => {
+    const { nodes, manualAlteredIds, alteredNodeIds } = get();
     const node = nodes.find((n) => n.id === nodeId);
-    if (!node) return;
+    if (!node) return { canAlter: false, reason: '节点不存在' };
 
-    if (newAltered.has(nodeId)) {
-      newAltered.delete(nodeId);
-    } else {
-      newAltered.add(nodeId);
-      for (const conflictId of node.conflicts) {
-        if (newAltered.has(conflictId)) {
-          newAltered.delete(conflictId);
-        }
+    if (alteredNodeIds.has(nodeId)) {
+      if (manualAlteredIds.has(nodeId)) {
+        return { canAlter: true, reason: '可恢复历史' };
+      } else {
+        const chainedBy = nodes.filter((n) => alteredNodeIds.has(n.id) && node.dependencies.includes(n.id));
+        return { canAlter: false, reason: `连锁改变（由「${chainedBy.map(n => n.title).join('」「')}」触发）` };
       }
     }
 
-    set({ alteredNodeIds: newAltered, simulationResult: null });
+    const unmetDeps = node.dependencies.filter((depId) => !alteredNodeIds.has(depId));
+    if (unmetDeps.length > 0) {
+      const depNames = unmetDeps.map((depId) => {
+        const dep = nodes.find((n) => n.id === depId);
+        return dep ? dep.title : depId;
+      });
+      return { canAlter: false, reason: `需先改变：${depNames.join('、')}` };
+    }
+
+    return { canAlter: true, reason: '可改变历史' };
+  },
+
+  isChainedAltered: (nodeId: string) => {
+    const { manualAlteredIds, alteredNodeIds } = get();
+    return alteredNodeIds.has(nodeId) && !manualAlteredIds.has(nodeId);
+  },
+
+  toggleNode: (nodeId: string) => {
+    const { manualAlteredIds, nodes } = get();
+    const node = nodes.find((n) => n.id === nodeId);
+    if (!node) return;
+
+    const newManual = new Set(manualAlteredIds);
+
+    if (newManual.has(nodeId)) {
+      newManual.delete(nodeId);
+    } else {
+      const { canAlter } = get().canToggleNode(nodeId);
+      if (!canAlter) return;
+      newManual.add(nodeId);
+      for (const conflictId of node.conflicts) {
+        newManual.delete(conflictId);
+      }
+    }
+
+    const fullAltered = computeFullAltered(newManual, nodes);
+    set({ manualAlteredIds: newManual, alteredNodeIds: fullAltered, simulationResult: null });
   },
 
   resetAll: () => {
     set({
+      manualAlteredIds: new Set(),
       alteredNodeIds: new Set(),
       simulationResult: null,
       selectedNodeId: null,
@@ -202,12 +277,12 @@ export const useWhatIfStore = create<WhatIfStore>((set, get) => ({
   },
 
   simulate: () => {
-    const { alteredNodeIds } = get();
+    const { alteredNodeIds, nodes } = get();
     set({ isSimulating: true });
 
     setTimeout(() => {
       const stats = calculateStats(alteredNodeIds);
-      const timeline = generateTimeline(alteredNodeIds);
+      const timeline = generateTimeline(alteredNodeIds, nodes);
       const civType = getCivilizationType(stats);
       const keyDifferences = getKeyDifferences(alteredNodeIds);
       const divergenceScore = calculateDivergenceScore(alteredNodeIds);
