@@ -9,6 +9,9 @@ import TransitionOverlay from '../components/TransitionOverlay';
 import FlavorTextModal from '../components/FlavorTextModal';
 import EventCardModal from '../components/EventCardModal';
 import EventResultModal from '../components/EventResultModal';
+import GreatPersonModal from '../components/GreatPersonModal';
+import GreatPersonResultModal from '../components/GreatPersonResultModal';
+import GreatPersonTimeline from '../components/GreatPersonTimeline';
 import { RotateCcw, BookOpen, Globe, Library, Users, Swords, GitBranch } from 'lucide-react';
 
 interface HeaderProps {
@@ -207,7 +210,10 @@ const Home: React.FC<HomeProps> = ({ onEnterEncyclopedia, onEnterMultiCiv, onEnt
     showFlavorText,
     showEventModal,
     showEventResult,
+    showGreatPersonModal,
+    showGreatPersonResult,
     checkForEvent,
+    checkForGreatPerson,
   } = useCivilizationStore();
   const [previousStats, setPreviousStats] = useState<CivilizationStats | undefined>(undefined);
   const [previousFlavorText, setPreviousFlavorText] = useState(false);
@@ -223,14 +229,17 @@ const Home: React.FC<HomeProps> = ({ onEnterEncyclopedia, onEnterMultiCiv, onEnt
   }, [isTransitioning, stats]);
 
   useEffect(() => {
-    if (previousFlavorText && !showFlavorText && !isComplete && !showEventModal && !showEventResult) {
+    if (previousFlavorText && !showFlavorText && !isComplete && !showEventModal && !showEventResult && !showGreatPersonModal && !showGreatPersonResult) {
       const timer = setTimeout(() => {
         checkForEvent();
+        setTimeout(() => {
+          checkForGreatPerson();
+        }, 300);
       }, 500);
       return () => clearTimeout(timer);
     }
     setPreviousFlavorText(showFlavorText);
-  }, [showFlavorText, previousFlavorText, isComplete, showEventModal, showEventResult, checkForEvent]);
+  }, [showFlavorText, previousFlavorText, isComplete, showEventModal, showEventResult, showGreatPersonModal, showGreatPersonResult, checkForEvent, checkForGreatPerson]);
 
   if (isLoading && !currentStage) {
     return <LoadingScreen />;
@@ -258,6 +267,10 @@ const Home: React.FC<HomeProps> = ({ onEnterEncyclopedia, onEnterMultiCiv, onEnt
 
         <StatsPanel previousStats={previousStats} />
 
+        <div className="max-w-6xl mx-auto px-4 mt-8">
+          <GreatPersonTimeline />
+        </div>
+
         {isComplete ? <CompletionScreen /> : <StageCard />}
       </main>
 
@@ -272,6 +285,8 @@ const Home: React.FC<HomeProps> = ({ onEnterEncyclopedia, onEnterMultiCiv, onEnt
       <FlavorTextModal />
       <EventCardModal />
       <EventResultModal />
+      <GreatPersonModal />
+      <GreatPersonResultModal />
     </div>
   );
 };

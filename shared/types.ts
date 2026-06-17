@@ -437,4 +437,103 @@ export interface BeliefInfection {
   source: 'indigenous' | 'trade' | 'war' | 'culture' | 'proximity';
 }
 
+export type GreatPersonType = 'thinker' | 'conqueror' | 'scientist' | 'religious_leader';
+export type GreatPersonPersonality =
+  | 'visionary'
+  | 'paranoid'
+  | 'charismatic'
+  | 'ruthless'
+  | 'idealistic'
+  | 'cynical'
+  | 'diligent'
+  | 'reckless'
+  | 'introverted'
+  | 'eloquent';
+export type GreatPersonBias =
+  | 'pro_technology'
+  | 'anti_technology'
+  | 'pro_military'
+  | 'anti_military'
+  | 'pro_culture'
+  | 'anti_culture'
+  | 'pro_agriculture'
+  | 'anti_agriculture'
+  | 'pro_centralization'
+  | 'pro_freedom'
+  | 'pro_tradition'
+  | 'pro_innovation'
+  | 'elitist'
+  | 'populist';
+export type GreatPersonStatus = 'active' | 'exiled' | 'assassinated' | 'ignored' | 'deceased';
+export type GreatPersonAction = 'support' | 'exile' | 'assassinate' | 'ignore';
+
+export interface GreatPerson {
+  id: string;
+  type: GreatPersonType;
+  name: string;
+  birthYear: number;
+  deathYear?: number;
+  personality: GreatPersonPersonality;
+  bias: GreatPersonBias;
+  era: EraStage[];
+  title: string;
+  description: string;
+  quote: string;
+  imageUrl: string;
+  icon: string;
+  effects: {
+    supported: Partial<CivilizationStats>;
+    ignored: Partial<CivilizationStats>;
+    exiled: Partial<CivilizationStats>;
+    assassinated: Partial<CivilizationStats>;
+  };
+  activeTurns: number;
+  maxTurns: number;
+  status: GreatPersonStatus;
+  actionTaken?: GreatPersonAction;
+  turnIntroduced: number;
+  flavorText: {
+    arrival: string;
+    support: string;
+    exile: string;
+    assassinate: string;
+    ignore: string;
+  };
+}
+
+export interface GreatPersonTimelineEvent {
+  id: string;
+  greatPersonId: string;
+  greatPersonName: string;
+  greatPersonType: GreatPersonType;
+  turn: number;
+  era: EraStage;
+  action: GreatPersonAction | 'arrival' | 'death';
+  description: string;
+  effects: Partial<CivilizationStats>;
+}
+
+export interface GreatPersonState {
+  activeGreatPerson: GreatPerson | null;
+  greatPersonHistory: GreatPerson[];
+  timelineEvents: GreatPersonTimelineEvent[];
+  usedGreatPersonIds: string[];
+  showGreatPersonModal: boolean;
+  showGreatPersonResult: boolean;
+  greatPersonResult: {
+    greatPerson: GreatPerson;
+    action: GreatPersonAction;
+    effects: Partial<CivilizationStats>;
+    flavorText: string;
+  } | null;
+}
+
+export interface GreatPersonGenerationConfig {
+  baseProbability: number;
+  eraMultipliers: Partial<Record<EraStage, number>>;
+  statRequirements: Partial<Record<GreatPersonType, Partial<Record<keyof CivilizationStats, number>>>>;
+  cooldownTurns: number;
+  maxActiveGreatPeople: number;
+}
+
 export interface BattleResultResponse extends ApiResponse<BattleResult> {}

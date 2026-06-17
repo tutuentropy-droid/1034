@@ -7,10 +7,24 @@ import type {
   ChoiceResult,
   HistoricalEvent,
   EventResult,
+  GreatPerson,
+  GreatPersonAction,
+  GreatPersonTimelineEvent,
+  GreatPersonState,
+  EraStage,
 } from '../types';
 import { fetchAllStages, submitChoice, resetCivilization, checkEventTrigger, resolveEvent } from '../utils/api';
+import {
+  tryGenerateGreatPerson,
+  getActionEffects,
+  getActionFlavorText,
+  updateGreatPersonStatus,
+  createTimelineEvent,
+  applyGreatPersonEffects,
+  processTurnlyGreatPersonEffects,
+} from '../lib/greatPersonEngine';
 
-interface CivilizationStore extends CivilizationState {
+interface CivilizationStore extends CivilizationState, GreatPersonState {
   stages: Stage[];
   isLoading: boolean;
   error: string | null;
@@ -23,6 +37,8 @@ interface CivilizationStore extends CivilizationState {
   showEventModal: boolean;
   showEventResult: boolean;
   eventHistory: HistoryEntry[];
+  currentTurn: number;
+  lastGreatPersonTurn: number;
 
   init: () => Promise<void>;
   makeChoice: (choiceId: string) => Promise<void>;
@@ -34,6 +50,10 @@ interface CivilizationStore extends CivilizationState {
   makeEventChoice: (choiceId: string) => Promise<void>;
   closeEventModal: () => void;
   closeEventResult: () => void;
+  checkForGreatPerson: () => void;
+  makeGreatPersonChoice: (action: GreatPersonAction) => void;
+  closeGreatPersonModal: () => void;
+  closeGreatPersonResult: () => void;
 }
 
 const CIVILIZATION_NAMES = [
@@ -77,6 +97,15 @@ export const useCivilizationStore = create<CivilizationStore>((set, get) => ({
   showEventModal: false,
   showEventResult: false,
   eventHistory: [],
+  activeGreatPerson: null,
+  greatPersonHistory: [],
+  timelineEvents: [],
+  usedGreatPersonIds: [],
+  showGreatPersonModal: false,
+  showGreatPersonResult: false,
+  greatPersonResult: null,
+  currentTurn: 0,
+  lastGreatPersonTurn: -10,
 
   init: async () => {
     set({ isLoading: true, error: null });
@@ -109,7 +138,7 @@ export const useCivilizationStore = create<CivilizationStore>((set, get) => ({
   },
 
   makeChoice: async (choiceId: string) => {
-    const { currentStageId, stats, currentStage, history } = get();
+    const { currentStageId, stats, currentStage, history, currentTurn, activeGreatPerson, greatPersonHistory, timelineEvents } = get();
     if (!currentStage) return;
 
     set({ isLoading: true });
@@ -125,13 +154,47 @@ export const useCivilizationStore = create<CivilizationStore>((set, get) => ({
           choiceTitle: choice.title,
         };
 
+        let newStats = response.data.newStats;
+        let updatedActiveGreatPerson = activeGreatPerson;
+        let updatedGreatPersonHistory = greatPersonHistory;
+        let updatedTimelineEvents = timelineEvents;
+        const newTurn = currentTurn + 1;
+
+        if (activeGreatPerson && activeGreatPerson.status === 'active' && activeGreatPerson.actionTaken === 'support') {
+          const turnResult = processTurnlyGreatPersonEffects(activeGreatPerson, newStats);
+          newStats = turnResult.stats;
+
+          if (turnResult.events.length > 0) {
+            updatedTimelineEvents = [...timelineEvents, ...turnResult.events];
+          }
+
+          if (turnResult.shouldRetire) {
+            const deceasedPerson = {
+              ...activeGreatPerson,
+              status: 'deceased' as const,
+              deathYear: activeGreatPerson.birthYear + 50 + Math.floor(Math.random() * 30),
+            };
+            updatedGreatPersonHistory = [...greatPersonHistory, deceasedPerson];
+            updatedActiveGreatPerson = null;
+          } else {
+            updatedActiveGreatPerson = {
+              ...activeGreatPerson,
+              activeTurns: activeGreatPerson.activeTurns + 1,
+            };
+          }
+        }
+
         set({
           transitionData: response.data,
           history: [...history, newHistory],
-          stats: response.data.newStats,
+          stats: newStats,
           isComplete: response.data.nextStage === null,
           showFlavorText: true,
           isLoading: false,
+          currentTurn: newTurn,
+          activeGreatPerson: updatedActiveGreatPerson,
+          greatPersonHistory: updatedGreatPersonHistory,
+          timelineEvents: updatedTimelineEvents,
         });
       } else {
         throw new Error(response.error || 'Failed to process choice');
@@ -185,6 +248,15 @@ export const useCivilizationStore = create<CivilizationStore>((set, get) => ({
           showEventModal: false,
           showEventResult: false,
           eventHistory: [],
+          activeGreatPerson: null,
+          greatPersonHistory: [],
+          timelineEvents: [],
+          usedGreatPersonIds: [],
+          showGreatPersonModal: false,
+          showGreatPersonResult: false,
+          greatPersonResult: null,
+          currentTurn: 0,
+          lastGreatPersonTurn: -10,
         });
       } else {
         throw new Error(response.error || 'Failed to reset');
@@ -264,5 +336,113 @@ export const useCivilizationStore = create<CivilizationStore>((set, get) => ({
 
   closeEventResult: () => {
     set({ showEventResult: false, eventResult: null });
+  },
+
+  checkForGreatPerson: () => {
+    const {
+      stats,
+      currentStage,
+      isComplete,
+      showEventModal,
+      showFlavorText,
+      isTransitioning,
+      showGreatPersonModal,
+      showGreatPersonResult,
+      activeGreatPerson,
+      usedGreatPersonIds,
+      currentTurn,
+      lastGreatPersonTurn,
+    } = get();
+
+    if (
+      !currentStage ||
+      isComplete ||
+      showEventModal ||
+      showFlavorText ||
+      isTransitioning ||
+      showGreatPersonModal ||
+      showGreatPersonResult
+    ) {
+      return;
+    }
+
+    const era = currentStage.eraColor as EraStage;
+    const turnsSinceLast = currentTurn - lastGreatPersonTurn;
+    const hasActive = activeGreatPerson !== null && activeGreatPerson.status === 'active' && activeGreatPerson.actionTaken === 'support';
+
+    const greatPerson = tryGenerateGreatPerson(
+      era,
+      stats,
+      usedGreatPersonIds,
+      currentTurn,
+      turnsSinceLast,
+      hasActive
+    );
+
+    if (greatPerson) {
+      const arrivalEvent = createTimelineEvent(
+        greatPerson,
+        'arrival',
+        currentTurn,
+        era,
+        {}
+      );
+
+      set({
+        activeGreatPerson: greatPerson,
+        showGreatPersonModal: true,
+        usedGreatPersonIds: [...usedGreatPersonIds, greatPerson.id],
+        timelineEvents: [...get().timelineEvents, arrivalEvent],
+        lastGreatPersonTurn: currentTurn,
+      });
+    }
+  },
+
+  makeGreatPersonChoice: (action: GreatPersonAction) => {
+    const { activeGreatPerson, stats, currentStage, currentTurn, greatPersonHistory, timelineEvents } = get();
+    if (!activeGreatPerson || !currentStage) return;
+
+    const era = currentStage.eraColor as EraStage;
+    const effects = getActionEffects(activeGreatPerson, action);
+    const flavorText = getActionFlavorText(activeGreatPerson, action);
+    const newStats = applyGreatPersonEffects(stats, effects);
+    const updatedGreatPerson = updateGreatPersonStatus(activeGreatPerson, action);
+
+    const actionEvent = createTimelineEvent(
+      updatedGreatPerson,
+      action,
+      currentTurn,
+      era,
+      effects
+    );
+
+    const newHistory = action === 'support'
+      ? greatPersonHistory
+      : [...greatPersonHistory, { ...updatedGreatPerson, actionTaken: action }];
+
+    const newActive = action === 'support' ? updatedGreatPerson : null;
+
+    set({
+      stats: newStats,
+      activeGreatPerson: newActive,
+      greatPersonHistory: newHistory,
+      timelineEvents: [...timelineEvents, actionEvent],
+      showGreatPersonModal: false,
+      showGreatPersonResult: true,
+      greatPersonResult: {
+        greatPerson: updatedGreatPerson,
+        action,
+        effects,
+        flavorText,
+      },
+    });
+  },
+
+  closeGreatPersonModal: () => {
+    set({ showGreatPersonModal: false });
+  },
+
+  closeGreatPersonResult: () => {
+    set({ showGreatPersonResult: false, greatPersonResult: null });
   },
 }));

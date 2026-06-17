@@ -62,6 +62,15 @@ import type {
   BeliefId,
   Belief,
   BeliefInfection,
+  GreatPersonType,
+  GreatPersonPersonality,
+  GreatPersonBias,
+  GreatPersonStatus,
+  GreatPersonAction,
+  GreatPerson,
+  GreatPersonTimelineEvent,
+  GreatPersonState,
+  GreatPersonGenerationConfig,
 } from '../../shared/types';
 
 export type {
@@ -131,7 +140,86 @@ export type {
   WhatIfRoute,
 };
 
-export type { BeliefId, Belief, BeliefInfection };
+export type {
+  BeliefId,
+  Belief,
+  BeliefInfection,
+  GreatPersonType,
+  GreatPersonPersonality,
+  GreatPersonBias,
+  GreatPersonStatus,
+  GreatPersonAction,
+  GreatPerson,
+  GreatPersonTimelineEvent,
+  GreatPersonState,
+  GreatPersonGenerationConfig,
+};
+
+export const GREAT_PERSON_TYPE_LABELS: Record<GreatPersonType, string> = {
+  thinker: '思想家',
+  conqueror: '征服者',
+  scientist: '科学家',
+  religious_leader: '宗教领袖',
+};
+
+export const GREAT_PERSON_TYPE_COLORS: Record<GreatPersonType, string> = {
+  thinker: 'from-indigo-500',
+  conqueror: 'from-red-500',
+  scientist: 'from-cyan-500',
+  religious_leader: 'from-purple-500',
+};
+
+export const GREAT_PERSON_TYPE_BG: Record<GreatPersonType, string> = {
+  thinker: 'bg-indigo-500',
+  conqueror: 'bg-red-500',
+  scientist: 'bg-cyan-500',
+  religious_leader: 'bg-purple-500',
+};
+
+export const GREAT_PERSON_PERSONALITY_LABELS: Record<GreatPersonPersonality, string> = {
+  visionary: '远见卓识',
+  paranoid: '偏执多疑',
+  charismatic: '魅力四射',
+  ruthless: '冷酷无情',
+  idealistic: '理想主义',
+  cynical: '愤世嫉俗',
+  diligent: '勤勉刻苦',
+  reckless: '鲁莽冲动',
+  introverted: '内向深沉',
+  eloquent: '雄辩滔滔',
+};
+
+export const GREAT_PERSON_BIAS_LABELS: Record<GreatPersonBias, string> = {
+  pro_technology: '崇尚科技',
+  anti_technology: '排斥科技',
+  pro_military: '崇尚武力',
+  anti_military: '反对战争',
+  pro_culture: '推崇文化',
+  anti_culture: '轻视文化',
+  pro_agriculture: '重视农业',
+  anti_agriculture: '轻视农业',
+  pro_centralization: '主张集权',
+  pro_freedom: '追求自由',
+  pro_tradition: '尊重传统',
+  pro_innovation: '鼓励创新',
+  elitist: '精英主义',
+  populist: '民粹主义',
+};
+
+export const GREAT_PERSON_ACTION_LABELS: Record<GreatPersonAction, string> = {
+  support: '支持',
+  exile: '流放',
+  assassinate: '暗杀',
+  ignore: '忽视',
+};
+
+export const GREAT_PERSON_STATUS_LABELS: Record<GreatPersonStatus, string> = {
+  active: '活跃',
+  exiled: '已流放',
+  assassinated: '已遇刺',
+  ignored: '被忽视',
+  deceased: '已逝世',
+};
 
 export const EVENT_CATEGORY_LABELS: Record<EventCategory, string> = {
   plague: '瘟疫',
