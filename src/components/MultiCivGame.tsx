@@ -1,11 +1,12 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useWorldStore } from '../store/useWorldStore';
 import { WorldMapView } from './WorldMapView';
 import { CivilizationInfoPanel } from './CivilizationInfoPanel';
 import { ActionPanel } from './ActionPanel';
 import { TurnEventsPanel } from './TurnEventsPanel';
+import { BeliefNetworkGraph } from './BeliefNetworkGraph';
 import type { EraStage, CivilizationRanking, AICivilization } from '../types';
-import { Globe, RotateCcw, ArrowLeft, Trophy, Crown, Medal, Swords, TrendingUp, FlaskConical, MapPin, Users } from 'lucide-react';
+import { Globe, RotateCcw, ArrowLeft, Trophy, Crown, Medal, Swords, TrendingUp, FlaskConical, MapPin, Users, Brain } from 'lucide-react';
 
 const ERA_INFO: Record<EraStage, { name: string; color: string }> = {
   stoneAge: { name: '石器时代', color: '#757575' },
@@ -87,6 +88,7 @@ function Leaderboard({ worldState }: { worldState: ReturnType<typeof useWorldSto
 
 export function MultiCivGame({ onExit }: MultiCivGameProps) {
   const { worldState, selectedCivilization, initMultiCivGame, resetMultiCivGame, isLoading } = useWorldStore();
+  const [showBeliefNetwork, setShowBeliefNetwork] = useState(false);
 
   useEffect(() => {
     if (!worldState) {
@@ -151,6 +153,17 @@ export function MultiCivGame({ onExit }: MultiCivGameProps) {
             </div>
 
             <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowBeliefNetwork(!showBeliefNetwork)}
+                className={`flex items-center gap-1.5 px-3 py-2 text-sm rounded-xl font-bold transition-all ${
+                  showBeliefNetwork
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-purple-100 text-purple-700 hover:bg-purple-200'
+                }`}
+              >
+                <Brain className="w-4 h-4" />
+                <span className="hidden sm:inline">信念网络</span>
+              </button>
               {playerCiv && (
                 <div className="hidden md:flex items-center gap-3 px-3 py-1.5 bg-slate-50 rounded-xl">
                   <div className="text-center">
@@ -244,6 +257,7 @@ export function MultiCivGame({ onExit }: MultiCivGameProps) {
         <div className="grid lg:grid-cols-4 gap-4">
           <div className="lg:col-span-3 space-y-4">
             <WorldMapView worldState={worldState} />
+            {showBeliefNetwork && <BeliefNetworkGraph worldState={worldState} />}
             <TurnEventsPanel worldState={worldState} />
           </div>
 

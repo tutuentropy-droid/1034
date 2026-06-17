@@ -59,6 +59,9 @@ import type {
   WhatIfTimelineEntry,
   WhatIfSimulationResult,
   WhatIfRoute,
+  BeliefId,
+  Belief,
+  BeliefInfection,
 } from '../../shared/types';
 
 export type {
@@ -127,6 +130,8 @@ export type {
   WhatIfSimulationResult,
   WhatIfRoute,
 };
+
+export type { BeliefId, Belief, BeliefInfection };
 
 export const EVENT_CATEGORY_LABELS: Record<EventCategory, string> = {
   plague: '瘟疫',

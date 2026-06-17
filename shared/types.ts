@@ -271,6 +271,7 @@ export interface AICivilization {
   };
   actionHistory: { turn: number; action: string; targetId?: string }[];
   expansionHistory: TerritoryExpansion[];
+  beliefs: BeliefInfection[];
 }
 
 export interface PlayerCivilization extends AICivilization {
@@ -401,6 +402,39 @@ export interface WhatIfRoute {
   timestamp: number;
   alteredNodes: string[];
   result: WhatIfSimulationResult;
+}
+
+export type BeliefId =
+  | 'consumerism'
+  | 'militarism'
+  | 'fundamentalism'
+  | 'techno_utopianism'
+  | 'isolationism'
+  | 'cosmopolitanism'
+  | 'egalitarianism'
+  | 'authoritarianism';
+
+export interface Belief {
+  id: BeliefId;
+  name: string;
+  icon: string;
+  color: string;
+  description: string;
+  baseInfectivity: number;
+  tradeMultiplier: number;
+  warMultiplier: number;
+  techMultiplier: number;
+  populationMultiplier: number;
+  eraAffinity: Partial<Record<EraStage, number>>;
+  traitAffinity: Partial<Record<CivilizationTrait, number>>;
+  effects: Partial<CivilizationStats>;
+}
+
+export interface BeliefInfection {
+  beliefId: BeliefId;
+  infectionLevel: number;
+  turnsInfected: number;
+  source: 'indigenous' | 'trade' | 'war' | 'culture' | 'proximity';
 }
 
 export interface BattleResultResponse extends ApiResponse<BattleResult> {}

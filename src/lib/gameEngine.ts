@@ -14,6 +14,7 @@ import type {
 } from '../types';
 import { makeAIDecision, generateCivilizationName, generateCivilizationColor } from './aiDecisionEngine';
 import { generateWorldMap, findStartPositions, getExpandableTiles, getAdjacentTiles } from './worldMapGenerator';
+import { getInitialBeliefs, propagateBeliefs } from './beliefEngine';
 
 const ERA_THRESHOLDS: EraThreshold[] = [
   { era: 'stoneAge', minPopulation: 0, minTechnology: 0, minCulture: 0, name: '石器时代', description: '文明的黎明，部落在荒野中求生' },
@@ -89,7 +90,7 @@ function createCivilization(id: string, startTileId: string, isPlayer: boolean =
   const traits = generateTraits();
   const personality = generatePersonality(traits);
 
-  return {
+  const civ: AICivilization = {
     id,
     name: isPlayer ? '你的文明' : generateCivilizationName(),
     color: isPlayer ? '#1E88E5' : generateCivilizationColor(),
@@ -102,7 +103,12 @@ function createCivilization(id: string, startTileId: string, isPlayer: boolean =
     personality,
     actionHistory: [],
     expansionHistory: [],
+    beliefs: [],
   };
+
+  civ.beliefs = getInitialBeliefs(civ);
+
+  return civ;
 }
 
 export function getEraThresholds(): EraThreshold[] {
@@ -888,6 +894,8 @@ export function processTurn(state: WorldState, playerAction?: AIAction): WorldSt
   }
 
   applyTurnlyGrowth(newState);
+  const beliefEvents = propagateBeliefs(newState);
+  newState.turnEvents = [...newState.turnEvents, ...beliefEvents];
   checkGameOver(newState);
 
   newState.rankings = calculateRankings(newState.civilizations);

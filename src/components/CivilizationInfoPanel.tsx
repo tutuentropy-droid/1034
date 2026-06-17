@@ -1,7 +1,8 @@
 import type { AICivilization, DiplomaticStatus, CivilizationTrait, EraStage, EraThreshold } from '../types';
 import { useWorldStore } from '../store/useWorldStore';
 import { getEraThresholds } from '../lib/gameEngine';
-import { Users, FlaskConical, BookOpen, Sword, Wheat, Crown, Handshake, Swords, TrendingUp, TrendingDown, Minus, ChevronRight } from 'lucide-react';
+import { getBeliefById } from '../lib/beliefEngine';
+import { Users, FlaskConical, BookOpen, Sword, Wheat, Crown, Handshake, Swords, TrendingUp, TrendingDown, Minus, ChevronRight, Brain } from 'lucide-react';
 
 interface CivilizationInfoPanelProps {
   civilization: AICivilization;
@@ -191,6 +192,105 @@ export function CivilizationInfoPanel({ civilization, isPlayer }: CivilizationIn
           <div className="text-xs text-green-600">农业</div>
         </div>
       </div>
+
+      {civilization.beliefs.length > 0 && (
+        <div className="mb-5 p-4 bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl border border-purple-200">
+          <h4 className="font-semibold text-slate-800 mb-3 flex items-center gap-2">
+            <Brain className="w-4 h-4 text-purple-600" />
+            信念系统
+          </h4>
+          <div className="space-y-2">
+            {civilization.beliefs
+              .sort((a, b) => b.infectionLevel - a.infectionLevel)
+              .map((infection) => {
+                const belief = getBeliefById(infection.beliefId);
+                if (!belief || infection.infectionLevel < 5) return null;
+                const levelColor =
+                  infection.infectionLevel >= 80
+                    ? 'text-red-700'
+                    : infection.infectionLevel >= 50
+                    ? 'text-orange-700'
+                    : infection.infectionLevel >= 30
+                    ? 'text-amber-700'
+                    : 'text-slate-600';
+                const barColor =
+                  infection.infectionLevel >= 80
+                    ? '#D32F2F'
+                    : infection.infectionLevel >= 50
+                    ? '#FF6D00'
+                    : infection.infectionLevel >= 30
+                    ? '#FFA000'
+                    : '#FFD54F';
+                const sourceLabel: Record<string, string> = {
+                  indigenous: '本土',
+                  trade: '贸易传入',
+                  war: '战争传入',
+                  culture: '文化渗透',
+                  proximity: '边境传播',
+                };
+                return (
+                  <div key={infection.beliefId}>
+                    <div className="flex items-center justify-between mb-0.5">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-sm">{belief.icon}</span>
+                        <span className={`text-xs font-bold ${levelColor}`}>{belief.name}</span>
+                        <span className="text-xs text-slate-400">
+                          ({sourceLabel[infection.source] || infection.source})
+                        </span>
+                      </div>
+                      <span className={`text-xs font-bold ${levelColor}`}>
+                        {infection.infectionLevel}%
+                      </span>
+                    </div>
+                    <div className="h-1.5 bg-white rounded-full overflow-hidden">
+                      <div
+                        className="h-full rounded-full transition-all duration-500"
+                        style={{
+                          width: `${infection.infectionLevel}%`,
+                          backgroundColor: barColor,
+                        }}
+                      />
+                    </div>
+                    {infection.infectionLevel >= 30 && (
+                      <div className="flex gap-2 mt-1 text-xs text-slate-500">
+                        {belief.effects.technology && belief.effects.technology > 0 && (
+                          <span className="text-blue-600">科技+{Math.floor(belief.effects.technology * infection.infectionLevel / 200)}</span>
+                        )}
+                        {belief.effects.technology && belief.effects.technology < 0 && (
+                          <span className="text-blue-400">科技{Math.floor(belief.effects.technology * infection.infectionLevel / 200)}</span>
+                        )}
+                        {belief.effects.military && belief.effects.military > 0 && (
+                          <span className="text-red-600">军事+{Math.floor(belief.effects.military * infection.infectionLevel / 200)}</span>
+                        )}
+                        {belief.effects.military && belief.effects.military < 0 && (
+                          <span className="text-red-400">军事{Math.floor(belief.effects.military * infection.infectionLevel / 200)}</span>
+                        )}
+                        {belief.effects.culture && belief.effects.culture > 0 && (
+                          <span className="text-purple-600">文化+{Math.floor(belief.effects.culture * infection.infectionLevel / 200)}</span>
+                        )}
+                        {belief.effects.culture && belief.effects.culture < 0 && (
+                          <span className="text-purple-400">文化{Math.floor(belief.effects.culture * infection.infectionLevel / 200)}</span>
+                        )}
+                        {belief.effects.agriculture && belief.effects.agriculture > 0 && (
+                          <span className="text-green-600">农业+{Math.floor(belief.effects.agriculture * infection.infectionLevel / 200)}</span>
+                        )}
+                        {belief.effects.agriculture && belief.effects.agriculture < 0 && (
+                          <span className="text-green-400">农业{Math.floor(belief.effects.agriculture * infection.infectionLevel / 200)}</span>
+                        )}
+                        {belief.effects.population && belief.effects.population > 0 && (
+                          <span className="text-amber-600">人口+{Math.floor(belief.effects.population * infection.infectionLevel / 200)}</span>
+                        )}
+                        {belief.effects.population && belief.effects.population < 0 && (
+                          <span className="text-amber-400">人口{Math.floor(belief.effects.population * infection.infectionLevel / 200)}</span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+          </div>
+        </div>
+      )}
 
       {!isPlayer && playerRelation && worldState && (
         <div className="mb-5 p-4 bg-slate-50 rounded-xl border border-slate-200">
