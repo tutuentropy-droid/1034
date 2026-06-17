@@ -620,3 +620,102 @@ export interface CivilizationCulture {
   generationTurn: number;
   totalCultureBonus: Partial<CivilizationStats>;
 }
+
+export interface StatsSnapshot {
+  turn: number;
+  stageId?: string;
+  stageTitle?: string;
+  era?: EraStage;
+  stats: CivilizationStats;
+  totalScore: number;
+  timestamp: number;
+}
+
+export interface MultiCivSnapshot {
+  turn: number;
+  civilizations: {
+    id: string;
+    name: string;
+    color: string;
+    stats: CivilizationStats;
+    territoryCount: number;
+    era: EraStage;
+    beliefs: BeliefInfection[];
+    isAlive: boolean;
+  }[];
+  timestamp: number;
+}
+
+export interface DeathCause {
+  cause: string;
+  description: string;
+  icon: string;
+  severity: 'critical' | 'high' | 'medium';
+  contributingStats: Partial<CivilizationStats>;
+}
+
+export interface MajorDecision {
+  id: string;
+  turn: number;
+  era?: EraStage;
+  type: 'stage_choice' | 'event_choice' | 'great_person' | 'player_action';
+  title: string;
+  description: string;
+  effects: Partial<CivilizationStats>;
+  impactScore: number;
+  isPivotal: boolean;
+}
+
+export interface CrazyEvent {
+  id: string;
+  turn: number;
+  title: string;
+  description: string;
+  type: string;
+  weirdness: number;
+  icon: string;
+}
+
+export interface BeliefRecord {
+  beliefId: BeliefId;
+  name: string;
+  icon: string;
+  color: string;
+  peakInfection: number;
+  peakTurn: number;
+  totalInfluence: number;
+  description: string;
+}
+
+export interface CivilizationMuseumReport {
+  mode: 'single' | 'multi';
+  civilizationName: string;
+  civilizationColor?: string;
+  duration: number;
+  startEra: EraStage;
+  endEra: EraStage;
+  finalStats: CivilizationStats;
+  finalScore: number;
+  finalRank?: number;
+  isVictory: boolean;
+  deathCause: DeathCause | null;
+  snapshots: StatsSnapshot[];
+  multiCivSnapshots?: MultiCivSnapshot[];
+  majorDecisions: MajorDecision[];
+  crazyEvents: CrazyEvent[];
+  dominantBeliefs: BeliefRecord[];
+  greatPeople: {
+    id: string;
+    name: string;
+    type: GreatPersonType;
+    title: string;
+    era: EraStage[];
+    status: GreatPersonStatus;
+    actionTaken?: GreatPersonAction;
+    turnIntroduced: number;
+  }[];
+  stageHistory: HistoryEntry[];
+  eventHistory: HistoryEntry[];
+  totalTurns: number;
+  generationTime: number;
+}

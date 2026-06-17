@@ -312,3 +312,21 @@ export const ERA_BORDER_COLORS: Record<string, string> = {
   imperial: 'border-imperial',
   scientific: 'border-scientific',
 };
+
+import type {
+  StatsSnapshot as TStatsSnapshot,
+  MultiCivSnapshot as TMultiCivSnapshot,
+  DeathCause as TDeathCause,
+  MajorDecision as TMajorDecision,
+  CrazyEvent as TCrazyEvent,
+  BeliefRecord as TBeliefRecord,
+  CivilizationMuseumReport as TCivilizationMuseumReport,
+} from '../../shared/types';
+
+export type StatsSnapshot = TStatsSnapshot;
+export type MultiCivSnapshot = TMultiCivSnapshot;
+export type DeathCause = TDeathCause;
+export type MajorDecision = TMajorDecision;
+export type CrazyEvent = TCrazyEvent;
+export type BeliefRecord = TBeliefRecord;
+export type CivilizationMuseumReport = TCivilizationMuseumReport;

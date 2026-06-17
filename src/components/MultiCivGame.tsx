@@ -6,7 +6,7 @@ import { ActionPanel } from './ActionPanel';
 import { TurnEventsPanel } from './TurnEventsPanel';
 import { BeliefNetworkGraph } from './BeliefNetworkGraph';
 import type { EraStage, CivilizationRanking, AICivilization } from '../types';
-import { Globe, RotateCcw, ArrowLeft, Trophy, Crown, Medal, Swords, TrendingUp, FlaskConical, MapPin, Users, Brain } from 'lucide-react';
+import { Globe, RotateCcw, ArrowLeft, Trophy, Crown, Medal, Swords, TrendingUp, FlaskConical, MapPin, Users, Brain, Building2 } from 'lucide-react';
 
 const ERA_INFO: Record<EraStage, { name: string; color: string }> = {
   stoneAge: { name: '石器时代', color: '#757575' },
@@ -235,6 +235,15 @@ export function MultiCivGame({ onExit }: MultiCivGameProps) {
                 </div>
               </div>
             )}
+            <div className="space-y-2 mb-4">
+              <button
+                onClick={() => alert('多文明模式的博物馆功能即将上线，敬请期待！')}
+                className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-amber-700 to-yellow-800 text-white font-bold rounded-xl hover:from-amber-800 hover:to-yellow-900 transition-all"
+              >
+                <Building2 className="w-5 h-5" />
+                进入文明博物馆
+              </button>
+            </div>
             <div className="flex gap-3">
               <button
                 onClick={resetMultiCivGame}

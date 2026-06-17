@@ -13,16 +13,18 @@ import GreatPersonModal from '../components/GreatPersonModal';
 import GreatPersonResultModal from '../components/GreatPersonResultModal';
 import GreatPersonTimeline from '../components/GreatPersonTimeline';
 import CulturePage from '../components/CulturePage';
-import { RotateCcw, BookOpen, Globe, Library, Users, Swords, GitBranch, Scroll } from 'lucide-react';
+import CivilizationMuseum from '../components/CivilizationMuseum';
+import { RotateCcw, BookOpen, Globe, Library, Users, Swords, GitBranch, Scroll, Building2 } from 'lucide-react';
 
 interface HeaderProps {
   onEnterEncyclopedia: () => void;
   onEnterMultiCiv: () => void;
   onEnterWhatIf: () => void;
   onEnterCulture: () => void;
+  onEnterMuseum: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ onEnterEncyclopedia, onEnterMultiCiv, onEnterWhatIf, onEnterCulture }) => {
+const Header: React.FC<HeaderProps> = ({ onEnterEncyclopedia, onEnterMultiCiv, onEnterWhatIf, onEnterCulture, onEnterMuseum }) => {
   const { reset, isLoading, civilizationName } = useCivilizationStore();
 
   return (
@@ -93,6 +95,22 @@ const Header: React.FC<HeaderProps> = ({ onEnterEncyclopedia, onEnterMultiCiv, o
             >
               <Library className="w-5 h-5" />
               <span className="hidden sm:inline">百科模式</span>
+            </button>
+
+            <button
+              onClick={onEnterMuseum}
+              className="
+                group flex items-center gap-2 px-5 py-3
+                bg-gradient-to-r from-amber-700 to-yellow-800
+                hover:from-amber-800 hover:to-yellow-900
+                text-white font-serif font-bold
+                rounded-xl border-2 border-amber-600
+                shadow-sm hover:shadow-lg
+                transition-all duration-300
+              "
+            >
+              <Building2 className="w-5 h-5" />
+              <span className="hidden sm:inline">文明博物馆</span>
             </button>
 
             <button
@@ -245,6 +263,10 @@ const Home: React.FC<HomeProps> = ({ onEnterEncyclopedia, onEnterMultiCiv, onEnt
     checkForEvent,
     checkForGreatPerson,
     openCulturePage,
+    openMuseum,
+    showMuseum,
+    museumReport,
+    closeMuseum,
   } = useCivilizationStore();
   const [previousStats, setPreviousStats] = useState<CivilizationStats | undefined>(undefined);
   const [previousFlavorText, setPreviousFlavorText] = useState(false);
@@ -291,7 +313,7 @@ const Home: React.FC<HomeProps> = ({ onEnterEncyclopedia, onEnterMultiCiv, onEnt
 
   return (
     <div className="min-h-screen">
-      <Header onEnterEncyclopedia={onEnterEncyclopedia} onEnterMultiCiv={onEnterMultiCiv} onEnterWhatIf={onEnterWhatIf} onEnterCulture={openCulturePage} />
+      <Header onEnterEncyclopedia={onEnterEncyclopedia} onEnterMultiCiv={onEnterMultiCiv} onEnterWhatIf={onEnterWhatIf} onEnterCulture={openCulturePage} onEnterMuseum={openMuseum} />
 
       <main className="pb-16">
         <Timeline />
@@ -319,6 +341,10 @@ const Home: React.FC<HomeProps> = ({ onEnterEncyclopedia, onEnterMultiCiv, onEnt
       <GreatPersonModal />
       <GreatPersonResultModal />
       <CulturePage />
+
+      {showMuseum && museumReport && !isComplete && (
+        <CivilizationMuseum report={museumReport} onClose={closeMuseum} />
+      )}
     </div>
   );
 };
