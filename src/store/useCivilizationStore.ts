@@ -7,12 +7,13 @@ import type {
   ChoiceResult,
   HistoricalEvent,
   EventResult,
-  GreatPerson,
   GreatPersonAction,
-  GreatPersonTimelineEvent,
   GreatPersonState,
   EraStage,
+  CivilizationCulture,
 } from '../types';
+void 0 as import('../types').GreatPerson;
+void 0 as import('../types').GreatPersonTimelineEvent;
 import { fetchAllStages, submitChoice, resetCivilization, checkEventTrigger, resolveEvent } from '../utils/api';
 import {
   tryGenerateGreatPerson,
@@ -23,6 +24,10 @@ import {
   applyGreatPersonEffects,
   processTurnlyGreatPersonEffects,
 } from '../lib/greatPersonEngine';
+import {
+  generateCivilizationCulture,
+  applyCultureBonus,
+} from '../lib/storyGenerator';
 
 interface CivilizationStore extends CivilizationState, GreatPersonState {
   stages: Stage[];
@@ -39,6 +44,9 @@ interface CivilizationStore extends CivilizationState, GreatPersonState {
   eventHistory: HistoryEntry[];
   currentTurn: number;
   lastGreatPersonTurn: number;
+  culture: CivilizationCulture | null;
+  showCulturePage: boolean;
+  effectiveStats: CivilizationStats;
 
   init: () => Promise<void>;
   makeChoice: (choiceId: string) => Promise<void>;
@@ -54,6 +62,9 @@ interface CivilizationStore extends CivilizationState, GreatPersonState {
   makeGreatPersonChoice: (action: GreatPersonAction) => void;
   closeGreatPersonModal: () => void;
   closeGreatPersonResult: () => void;
+  openCulturePage: () => void;
+  closeCulturePage: () => void;
+  regenerateCulture: () => void;
 }
 
 const CIVILIZATION_NAMES = [
@@ -78,6 +89,11 @@ const initialStats: CivilizationStats = {
   military: 5,
   agriculture: 0,
 };
+
+function computeEffectiveStats(stats: CivilizationStats, culture: CivilizationCulture | null): CivilizationStats {
+  if (!culture) return { ...stats };
+  return applyCultureBonus(stats, culture);
+}
 
 export const useCivilizationStore = create<CivilizationStore>((set, get) => ({
   currentStageId: '',
@@ -106,6 +122,9 @@ export const useCivilizationStore = create<CivilizationStore>((set, get) => ({
   greatPersonResult: null,
   currentTurn: 0,
   lastGreatPersonTurn: -10,
+  culture: null,
+  showCulturePage: false,
+  effectiveStats: initialStats,
 
   init: async () => {
     set({ isLoading: true, error: null });
@@ -119,11 +138,17 @@ export const useCivilizationStore = create<CivilizationStore>((set, get) => ({
           ...firstStage.startingStats,
         } as CivilizationStats;
 
+        const era = firstStage.eraColor as EraStage;
+        const culture = generateCivilizationCulture(era, initialState, 0);
+        const effectiveStats = computeEffectiveStats(initialState, culture);
+
         set({
           stages,
           currentStageId: firstStage.id,
           currentStage: firstStage,
           stats: initialState,
+          effectiveStats,
+          culture,
           isLoading: false,
         });
       } else {
@@ -138,7 +163,7 @@ export const useCivilizationStore = create<CivilizationStore>((set, get) => ({
   },
 
   makeChoice: async (choiceId: string) => {
-    const { currentStageId, stats, currentStage, history, currentTurn, activeGreatPerson, greatPersonHistory, timelineEvents } = get();
+    const { currentStageId, stats, currentStage, history, currentTurn, activeGreatPerson, greatPersonHistory, timelineEvents, culture } = get();
     if (!currentStage) return;
 
     set({ isLoading: true });
@@ -184,10 +209,13 @@ export const useCivilizationStore = create<CivilizationStore>((set, get) => ({
           }
         }
 
+        const effectiveStats = computeEffectiveStats(newStats, culture);
+
         set({
           transitionData: response.data,
           history: [...history, newHistory],
           stats: newStats,
+          effectiveStats,
           isComplete: response.data.nextStage === null,
           showFlavorText: true,
           isLoading: false,
@@ -231,10 +259,16 @@ export const useCivilizationStore = create<CivilizationStore>((set, get) => ({
     try {
       const response = await resetCivilization();
       if (response.success && response.data) {
+        const era = response.data.currentStage.eraColor as EraStage;
+        const culture = generateCivilizationCulture(era, response.data.initialStats, 0);
+        const effectiveStats = computeEffectiveStats(response.data.initialStats, culture);
+
         set({
           currentStageId: response.data.currentStage.id,
           currentStage: response.data.currentStage,
           stats: response.data.initialStats,
+          effectiveStats,
+          culture,
           history: [],
           isComplete: false,
           civilizationName: getRandomCivilizationName(),
@@ -257,6 +291,7 @@ export const useCivilizationStore = create<CivilizationStore>((set, get) => ({
           greatPersonResult: null,
           currentTurn: 0,
           lastGreatPersonTurn: -10,
+          showCulturePage: false,
         });
       } else {
         throw new Error(response.error || 'Failed to reset');
@@ -295,7 +330,7 @@ export const useCivilizationStore = create<CivilizationStore>((set, get) => ({
   },
 
   makeEventChoice: async (choiceId: string) => {
-    const { currentEvent, stats, eventHistory } = get();
+    const { currentEvent, stats, eventHistory, culture } = get();
     if (!currentEvent) return;
 
     set({ isLoading: true });
@@ -311,9 +346,13 @@ export const useCivilizationStore = create<CivilizationStore>((set, get) => ({
           choiceTitle: choice.title,
         };
 
+        const newStats = response.data.newStats;
+        const effectiveStats = computeEffectiveStats(newStats, culture);
+
         set({
           eventResult: response.data,
-          stats: response.data.newStats,
+          stats: newStats,
+          effectiveStats,
           showEventModal: false,
           showEventResult: true,
           eventHistory: [...eventHistory, newHistoryEntry],
@@ -399,7 +438,7 @@ export const useCivilizationStore = create<CivilizationStore>((set, get) => ({
   },
 
   makeGreatPersonChoice: (action: GreatPersonAction) => {
-    const { activeGreatPerson, stats, currentStage, currentTurn, greatPersonHistory, timelineEvents } = get();
+    const { activeGreatPerson, stats, currentStage, currentTurn, greatPersonHistory, timelineEvents, culture } = get();
     if (!activeGreatPerson || !currentStage) return;
 
     const era = currentStage.eraColor as EraStage;
@@ -407,6 +446,7 @@ export const useCivilizationStore = create<CivilizationStore>((set, get) => ({
     const flavorText = getActionFlavorText(activeGreatPerson, action);
     const newStats = applyGreatPersonEffects(stats, effects);
     const updatedGreatPerson = updateGreatPersonStatus(activeGreatPerson, action);
+    const effectiveStats = computeEffectiveStats(newStats, culture);
 
     const actionEvent = createTimelineEvent(
       updatedGreatPerson,
@@ -424,6 +464,7 @@ export const useCivilizationStore = create<CivilizationStore>((set, get) => ({
 
     set({
       stats: newStats,
+      effectiveStats,
       activeGreatPerson: newActive,
       greatPersonHistory: newHistory,
       timelineEvents: [...timelineEvents, actionEvent],
@@ -444,5 +485,22 @@ export const useCivilizationStore = create<CivilizationStore>((set, get) => ({
 
   closeGreatPersonResult: () => {
     set({ showGreatPersonResult: false, greatPersonResult: null });
+  },
+
+  openCulturePage: () => {
+    set({ showCulturePage: true });
+  },
+
+  closeCulturePage: () => {
+    set({ showCulturePage: false });
+  },
+
+  regenerateCulture: () => {
+    const { currentStage, stats, currentTurn } = get();
+    if (!currentStage) return;
+    const era = currentStage.eraColor as EraStage;
+    const newCulture = generateCivilizationCulture(era, stats, currentTurn);
+    const newEffectiveStats = computeEffectiveStats(stats, newCulture);
+    set({ culture: newCulture, effectiveStats: newEffectiveStats });
   },
 }));

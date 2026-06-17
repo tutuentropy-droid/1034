@@ -90,7 +90,7 @@ interface StatsPanelProps {
 }
 
 const StatsPanel: React.FC<StatsPanelProps> = ({ previousStats }) => {
-  const { stats, civilizationName } = useCivilizationStore();
+  const { effectiveStats, civilizationName, stats } = useCivilizationStore();
 
   const statKeys: (keyof CivilizationStats)[] = [
     'population',
@@ -100,11 +100,19 @@ const StatsPanel: React.FC<StatsPanelProps> = ({ previousStats }) => {
     'agriculture',
   ];
 
+  const displayStats = effectiveStats;
+  const hasCultureBonus = statKeys.some(k => effectiveStats[k] !== stats[k]);
+
   return (
     <div className="w-full max-w-4xl mx-auto mb-8">
       <div className="text-center mb-6">
         <h2 className="font-serif text-2xl text-ochre-700 mb-1">
           「{civilizationName}」文明状态
+          {hasCultureBonus && (
+            <span className="ml-2 text-sm font-normal text-purple-600 bg-purple-100 px-2 py-0.5 rounded-full">
+              ✨ 含文化加成
+            </span>
+          )}
         </h2>
         <div className="w-32 h-1 bg-gradient-to-r from-transparent via-gold-500 to-transparent mx-auto" />
       </div>
@@ -114,7 +122,7 @@ const StatsPanel: React.FC<StatsPanelProps> = ({ previousStats }) => {
           <StatItem
             key={key}
             label={STAT_LABELS[key]}
-            value={stats[key]}
+            value={displayStats[key]}
             icon={React.createElement(STAT_ICONS[key], { className: 'w-5 h-5' })}
             color={STAT_COLORS[key]}
             previousValue={previousStats?.[key]}

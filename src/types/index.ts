@@ -71,6 +71,14 @@ import type {
   GreatPersonTimelineEvent,
   GreatPersonState,
   GreatPersonGenerationConfig,
+  CivilizationMyth,
+  LawArticle,
+  LegalSystem,
+  CurrencySystem,
+  FlagPattern,
+  CivilizationFlag,
+  CivilizationSlogan,
+  CivilizationCulture,
 } from '../../shared/types';
 
 export type {
@@ -129,6 +137,14 @@ export type {
   EraThreshold,
   CivilizationRanking,
   TerritoryExpansion,
+  CivilizationMyth,
+  LawArticle,
+  LegalSystem,
+  CurrencySystem,
+  FlagPattern,
+  CivilizationFlag,
+  CivilizationSlogan,
+  CivilizationCulture,
 };
 
 export type CivilizationStats = TCivilizationStats;

@@ -12,15 +12,17 @@ import EventResultModal from '../components/EventResultModal';
 import GreatPersonModal from '../components/GreatPersonModal';
 import GreatPersonResultModal from '../components/GreatPersonResultModal';
 import GreatPersonTimeline from '../components/GreatPersonTimeline';
-import { RotateCcw, BookOpen, Globe, Library, Users, Swords, GitBranch } from 'lucide-react';
+import CulturePage from '../components/CulturePage';
+import { RotateCcw, BookOpen, Globe, Library, Users, Swords, GitBranch, Scroll } from 'lucide-react';
 
 interface HeaderProps {
   onEnterEncyclopedia: () => void;
   onEnterMultiCiv: () => void;
   onEnterWhatIf: () => void;
+  onEnterCulture: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ onEnterEncyclopedia, onEnterMultiCiv, onEnterWhatIf }) => {
+const Header: React.FC<HeaderProps> = ({ onEnterEncyclopedia, onEnterMultiCiv, onEnterWhatIf, onEnterCulture }) => {
   const { reset, isLoading, civilizationName } = useCivilizationStore();
 
   return (
@@ -93,6 +95,22 @@ const Header: React.FC<HeaderProps> = ({ onEnterEncyclopedia, onEnterMultiCiv, o
               <span className="hidden sm:inline">百科模式</span>
             </button>
 
+            <button
+              onClick={onEnterCulture}
+              className="
+                group flex items-center gap-2 px-5 py-3
+                bg-gradient-to-r from-purple-500 to-indigo-600
+                hover:from-purple-600 hover:to-indigo-700
+                text-white font-serif font-bold
+                rounded-xl border-2 border-purple-400
+                shadow-sm hover:shadow-lg
+                transition-all duration-300
+              "
+            >
+              <Scroll className="w-5 h-5" />
+              <span className="hidden sm:inline">文化殿堂</span>
+            </button>
+
             <div className="text-right hidden sm:block">
               <p className="text-xs text-ochre-500 font-medium">当前文明</p>
               <p className="font-serif text-xl font-bold text-ochre-700">
@@ -120,7 +138,7 @@ const Header: React.FC<HeaderProps> = ({ onEnterEncyclopedia, onEnterMultiCiv, o
           </div>
         </div>
 
-        <div className="mt-6 grid md:grid-cols-3 gap-4">
+        <div className="mt-6 grid md:grid-cols-4 gap-4">
           <div className="p-4 bg-red-50/60 rounded-xl border border-red-200 backdrop-blur-sm">
             <div className="flex items-start gap-3">
               <GitBranch className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
@@ -151,6 +169,18 @@ const Header: React.FC<HeaderProps> = ({ onEnterEncyclopedia, onEnterMultiCiv, o
                 <strong>多文明竞争模式：</strong>与AI文明共同发展！贸易、战争、联盟、文化传播，
                 每回合AI根据规则自动决策。你需要发展自己的文明，扩张领土，
                 在世界舞台上与其他文明竞争，最终成为世界霸主！
+              </p>
+            </div>
+          </div>
+
+          <div className="p-4 bg-purple-50/60 rounded-xl border border-purple-200 backdrop-blur-sm">
+            <div className="flex items-start gap-3">
+              <Scroll className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+              <p className="text-purple-700/90 text-sm leading-relaxed font-sans">
+                <strong>文化殿堂：</strong>系统自动为你的文明生成独特的神话故事、法律法典、货币体系——
+                比如「神树共和国」「永恒金币信用体系」「天空契约法典」。
+                这些文化不是装饰，而是真实影响文明数值！共同信仰提高合作效率，
+                完善法律增加社会秩序，稳定货币加速贸易发展。
               </p>
             </div>
           </div>
@@ -214,6 +244,7 @@ const Home: React.FC<HomeProps> = ({ onEnterEncyclopedia, onEnterMultiCiv, onEnt
     showGreatPersonResult,
     checkForEvent,
     checkForGreatPerson,
+    openCulturePage,
   } = useCivilizationStore();
   const [previousStats, setPreviousStats] = useState<CivilizationStats | undefined>(undefined);
   const [previousFlavorText, setPreviousFlavorText] = useState(false);
@@ -260,7 +291,7 @@ const Home: React.FC<HomeProps> = ({ onEnterEncyclopedia, onEnterMultiCiv, onEnt
 
   return (
     <div className="min-h-screen">
-      <Header onEnterEncyclopedia={onEnterEncyclopedia} onEnterMultiCiv={onEnterMultiCiv} onEnterWhatIf={onEnterWhatIf} />
+      <Header onEnterEncyclopedia={onEnterEncyclopedia} onEnterMultiCiv={onEnterMultiCiv} onEnterWhatIf={onEnterWhatIf} onEnterCulture={openCulturePage} />
 
       <main className="pb-16">
         <Timeline />
@@ -287,6 +318,7 @@ const Home: React.FC<HomeProps> = ({ onEnterEncyclopedia, onEnterMultiCiv, onEnt
       <EventResultModal />
       <GreatPersonModal />
       <GreatPersonResultModal />
+      <CulturePage />
     </div>
   );
 };

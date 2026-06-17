@@ -537,3 +537,86 @@ export interface GreatPersonGenerationConfig {
 }
 
 export interface BattleResultResponse extends ApiResponse<BattleResult> {}
+
+export interface CivilizationMyth {
+  id: string;
+  name: string;
+  type: 'nature' | 'ancestor' | 'cosmic' | 'heroic' | 'agricultural';
+  title: string;
+  summary: string;
+  story: string[];
+  coreDeity: string;
+  sacredSymbol: string;
+  effects: Partial<CivilizationStats>;
+  cooperationBonus: number;
+}
+
+export interface LawArticle {
+  id: string;
+  title: string;
+  content: string;
+  category: 'criminal' | 'civil' | 'religious' | 'economic' | 'military';
+  severity: 'mild' | 'moderate' | 'severe';
+  effects: Partial<CivilizationStats>;
+}
+
+export interface LegalSystem {
+  id: string;
+  name: string;
+  type: 'divine' | 'customary' | 'codified' | 'military' | 'oral';
+  title: string;
+  description: string;
+  corePrinciple: string;
+  articles: LawArticle[];
+  effects: Partial<CivilizationStats>;
+  socialOrderBonus: number;
+}
+
+export interface CurrencySystem {
+  id: string;
+  name: string;
+  type: 'commodity' | 'metallic' | 'fiat' | 'credit' | 'ritual';
+  unitName: string;
+  material: string;
+  symbol: string;
+  description: string;
+  originStory: string;
+  conversionRate: number;
+  effects: Partial<CivilizationStats>;
+  tradeEfficiencyBonus: number;
+}
+
+export interface FlagPattern {
+  type: 'stripes' | 'cross' | 'circle' | 'triangle' | 'stars' | 'animal' | 'plant' | 'abstract';
+  colors: string[];
+  primaryColor: string;
+  secondaryColor: string;
+  accentColor: string;
+}
+
+export interface CivilizationFlag {
+  id: string;
+  pattern: FlagPattern;
+  mottoBorder: string;
+  centralEmblem: string;
+  description: string;
+}
+
+export interface CivilizationSlogan {
+  id: string;
+  short: string;
+  full: string;
+  theme: 'unity' | 'glory' | 'wisdom' | 'prosperity' | 'eternity' | 'harmony';
+  effects: Partial<CivilizationStats>;
+  moraleBonus: number;
+}
+
+export interface CivilizationCulture {
+  myth: CivilizationMyth;
+  legalSystem: LegalSystem;
+  currencySystem: CurrencySystem;
+  flag: CivilizationFlag;
+  slogan: CivilizationSlogan;
+  generationTurn: number;
+  totalCultureBonus: Partial<CivilizationStats>;
+}
