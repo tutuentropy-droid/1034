@@ -76,3 +76,69 @@ body::before {
     transform: translateY(0);
   }
 }
+
+@keyframes rippleOut {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+@keyframes dominoFall {
+  0% {
+    transform: rotateX(0deg);
+    opacity: 1;
+  }
+  60% {
+    transform: rotateX(80deg);
+    opacity: 0.8;
+  }
+  100% {
+    transform: rotateX(90deg);
+    opacity: 0.3;
+  }
+}
+
+@keyframes branchGrow {
+  0% {
+    stroke-dashoffset: 200;
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+}
+
+@keyframes statPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@layer components {
+  .animate-ripple {
+    animation: rippleOut 0.8s ease-out;
+  }
+  .animate-domino {
+    animation: dominoFall 0.6s ease-in forwards;
+    transform-origin: bottom center;
+  }
+  .animate-branch {
+    stroke-dasharray: 200;
+    animation: branchGrow 1s ease-out forwards;
+  }
+  .animate-stat-pulse {
+    animation: statPulse 0.4s ease-in-out;
+  }
+}

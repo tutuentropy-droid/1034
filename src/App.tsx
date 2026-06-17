@@ -5,6 +5,7 @@ import { EncyclopediaHome } from '@/components/EncyclopediaHome';
 import { KnowledgeNodeDetail } from '@/components/KnowledgeNodeDetail';
 import { KnowledgeGraph } from '@/components/KnowledgeGraph';
 import { MultiCivGame } from '@/components/MultiCivGame';
+import { WhatIfSandbox } from '@/components/WhatIfSandbox';
 import { useEncyclopediaStore } from '@/store/useEncyclopediaStore';
 
 function EncyclopediaMode({ onExit }: { onExit: () => void }) {
@@ -43,7 +44,7 @@ function EncyclopediaMode({ onExit }: { onExit: () => void }) {
 }
 
 export default function App() {
-  const [mode, setMode] = useState<'game' | 'encyclopedia' | 'multiCiv'>('game');
+  const [mode, setMode] = useState<'game' | 'encyclopedia' | 'multiCiv' | 'whatIf'>('game');
 
   const handleEnterEncyclopedia = () => {
     useEncyclopediaStore.getState().setCurrentView('home');
@@ -54,11 +55,19 @@ export default function App() {
     setMode('multiCiv');
   };
 
+  const handleEnterWhatIf = () => {
+    setMode('whatIf');
+  };
+
   const handleExitEncyclopedia = () => {
     setMode('game');
   };
 
   const handleExitMultiCiv = () => {
+    setMode('game');
+  };
+
+  const handleExitWhatIf = () => {
     setMode('game');
   };
 
@@ -72,8 +81,10 @@ export default function App() {
               <EncyclopediaMode onExit={handleExitEncyclopedia} />
             ) : mode === 'multiCiv' ? (
               <MultiCivGame onExit={handleExitMultiCiv} />
+            ) : mode === 'whatIf' ? (
+              <WhatIfSandbox onExit={handleExitWhatIf} />
             ) : (
-              <Home onEnterEncyclopedia={handleEnterEncyclopedia} onEnterMultiCiv={handleEnterMultiCiv} />
+              <Home onEnterEncyclopedia={handleEnterEncyclopedia} onEnterMultiCiv={handleEnterMultiCiv} onEnterWhatIf={handleEnterWhatIf} />
             )
           }
         />

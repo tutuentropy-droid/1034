@@ -347,4 +347,60 @@ export interface CultureSpreadResult {
 
 export interface WorldStateResponse extends ApiResponse<WorldState> {}
 export interface AIDecisionResponse extends ApiResponse<AIAction> {}
+export interface WhatIfNode {
+  id: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  era: string;
+  eraColor: string;
+  yearLabel: string;
+  imageUrl: string;
+  icon: string;
+  category: string;
+  defaultState: boolean;
+  alteration: {
+    title: string;
+    description: string;
+    logic: string;
+    consequences: string[];
+  };
+  effects: {
+    on: Partial<CivilizationStats>;
+    off: Partial<CivilizationStats>;
+  };
+  dependencies: string[];
+  conflicts: string[];
+}
+
+export interface WhatIfTimelineEntry {
+  nodeId: string;
+  altered: boolean;
+  era: string;
+  yearLabel: string;
+  title: string;
+  alteredTitle: string;
+  description: string;
+  alteredDescription: string;
+  logic: string;
+  effects: Partial<CivilizationStats>;
+}
+
+export interface WhatIfSimulationResult {
+  timeline: WhatIfTimelineEntry[];
+  finalStats: CivilizationStats;
+  civilizationType: string;
+  civilizationDescription: string;
+  divergenceScore: number;
+  keyDifferences: string[];
+}
+
+export interface WhatIfRoute {
+  id: string;
+  name: string;
+  timestamp: number;
+  alteredNodes: string[];
+  result: WhatIfSimulationResult;
+}
+
 export interface BattleResultResponse extends ApiResponse<BattleResult> {}

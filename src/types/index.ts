@@ -55,6 +55,10 @@ import type {
   EraThreshold,
   CivilizationRanking,
   TerritoryExpansion,
+  WhatIfNode,
+  WhatIfTimelineEntry,
+  WhatIfSimulationResult,
+  WhatIfRoute,
 } from '../../shared/types';
 
 export type {
@@ -116,6 +120,13 @@ export type {
 };
 
 export type CivilizationStats = TCivilizationStats;
+
+export type {
+  WhatIfNode,
+  WhatIfTimelineEntry,
+  WhatIfSimulationResult,
+  WhatIfRoute,
+};
 
 export const EVENT_CATEGORY_LABELS: Record<EventCategory, string> = {
   plague: '瘟疫',

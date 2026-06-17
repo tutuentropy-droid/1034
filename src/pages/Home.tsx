@@ -9,14 +9,15 @@ import TransitionOverlay from '../components/TransitionOverlay';
 import FlavorTextModal from '../components/FlavorTextModal';
 import EventCardModal from '../components/EventCardModal';
 import EventResultModal from '../components/EventResultModal';
-import { RotateCcw, BookOpen, Globe, Library, Users, Swords } from 'lucide-react';
+import { RotateCcw, BookOpen, Globe, Library, Users, Swords, GitBranch } from 'lucide-react';
 
 interface HeaderProps {
   onEnterEncyclopedia: () => void;
   onEnterMultiCiv: () => void;
+  onEnterWhatIf: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ onEnterEncyclopedia, onEnterMultiCiv }) => {
+const Header: React.FC<HeaderProps> = ({ onEnterEncyclopedia, onEnterMultiCiv, onEnterWhatIf }) => {
   const { reset, isLoading, civilizationName } = useCivilizationStore();
 
   return (
@@ -42,6 +43,22 @@ const Header: React.FC<HeaderProps> = ({ onEnterEncyclopedia, onEnterMultiCiv })
           </div>
 
           <div className="flex items-center gap-4">
+            <button
+              onClick={onEnterWhatIf}
+              className="
+                group flex items-center gap-2 px-5 py-3
+                bg-gradient-to-r from-red-500 to-amber-500
+                hover:from-red-600 hover:to-amber-600
+                text-white font-serif font-bold
+                rounded-xl border-2 border-red-400
+                shadow-sm hover:shadow-lg
+                transition-all duration-300
+              "
+            >
+              <GitBranch className="w-5 h-5" />
+              <span className="hidden sm:inline">如果历史重来</span>
+            </button>
+
             <button
               onClick={onEnterMultiCiv}
               className="
@@ -100,7 +117,18 @@ const Header: React.FC<HeaderProps> = ({ onEnterEncyclopedia, onEnterMultiCiv })
           </div>
         </div>
 
-        <div className="mt-6 grid md:grid-cols-2 gap-4">
+        <div className="mt-6 grid md:grid-cols-3 gap-4">
+          <div className="p-4 bg-red-50/60 rounded-xl border border-red-200 backdrop-blur-sm">
+            <div className="flex items-start gap-3">
+              <GitBranch className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+              <p className="text-red-700/90 text-sm leading-relaxed font-sans">
+                <strong>如果历史重来：</strong>进入历史沙盘！改变关键节点——
+                "没有农业革命会怎样""印刷术晚出现500年会怎样"，
+                系统自动生成另类历史时间线。推倒多米诺骨牌，看看文明会如何分叉！
+              </p>
+            </div>
+          </div>
+
           <div className="p-4 bg-parchment-100/60 rounded-xl border border-parchment-300 backdrop-blur-sm">
             <div className="flex items-start gap-3">
               <BookOpen className="w-5 h-5 text-ochre-600 flex-shrink-0 mt-0.5" />
@@ -164,9 +192,10 @@ const ErrorScreen: React.FC<{ message: string; onRetry: () => void }> = ({ messa
 interface HomeProps {
   onEnterEncyclopedia: () => void;
   onEnterMultiCiv: () => void;
+  onEnterWhatIf: () => void;
 }
 
-const Home: React.FC<HomeProps> = ({ onEnterEncyclopedia, onEnterMultiCiv }) => {
+const Home: React.FC<HomeProps> = ({ onEnterEncyclopedia, onEnterMultiCiv, onEnterWhatIf }) => {
   const {
     init,
     isLoading,
@@ -222,7 +251,7 @@ const Home: React.FC<HomeProps> = ({ onEnterEncyclopedia, onEnterMultiCiv }) => 
 
   return (
     <div className="min-h-screen">
-      <Header onEnterEncyclopedia={onEnterEncyclopedia} onEnterMultiCiv={onEnterMultiCiv} />
+      <Header onEnterEncyclopedia={onEnterEncyclopedia} onEnterMultiCiv={onEnterMultiCiv} onEnterWhatIf={onEnterWhatIf} />
 
       <main className="pb-16">
         <Timeline />
